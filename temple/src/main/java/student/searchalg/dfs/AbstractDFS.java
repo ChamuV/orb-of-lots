@@ -1,32 +1,26 @@
-package student.searchalg;
+package student.searchalg.dfs;
 
 import game.ExplorationState;
 import game.NodeStatus;
+import student.searchalg.SearchAlgorithm;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
- * Basic depth-first search exploration strategy.
+ * Common code for depth-first search strategies.
  *
- * This algorithm systematically explores unvisited neighbouring tiles and
- * backtracks when it reaches a dead end. It prioritises correctness over speed:
- * if the Orb is reachable, DFS will eventually find it.
+ * This class is not intended to be used directly, but provides shared
+ * functionality for DFS implementations in this package.
  */
-public class DFS implements SearchAlgorithm {
+public abstract class AbstractDFS implements SearchAlgorithm {
 
     @Override
     public void findOrb(ExplorationState state) {
         search(state, new HashSet<>());
     }
 
-    /**
-     * Recursively explores the cavern from the current location.
-     *
-     * @param state   current exploration state
-     * @param visited IDs of tiles already visited
-     * @return true once the explorer is standing on the Orb
-     */
     private boolean search(ExplorationState state, Set<Long> visited) {
         if (state.getDistanceToTarget() == 0) {
             return true;
@@ -35,7 +29,7 @@ public class DFS implements SearchAlgorithm {
         long currentLocation = state.getCurrentLocation();
         visited.add(currentLocation);
 
-        for (NodeStatus neighbour : state.getNeighbours()) {
+        for (NodeStatus neighbour : orderedNeighbours(state)) {
             long neighbourId = neighbour.nodeID();
 
             if (visited.contains(neighbourId)) {
@@ -53,4 +47,6 @@ public class DFS implements SearchAlgorithm {
 
         return false;
     }
+
+    protected abstract List<NodeStatus> orderedNeighbours(ExplorationState state);
 }
