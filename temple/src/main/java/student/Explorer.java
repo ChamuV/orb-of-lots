@@ -3,6 +3,7 @@ package student;
 import game.EscapeState;
 import game.ExplorationState;
 
+import student.searchalg.DFS;
 import student.searchalg.GreedyDFS;
 import student.searchalg.SearchAlgorithm;
 
@@ -39,7 +40,7 @@ public class Explorer {
      * @param state the information available at the current state
      */
     public void explore(ExplorationState state) {
-        SearchAlgorithm algorithm = new GreedyDFS();
+        SearchAlgorithm algorithm = new DFS();
         algorithm.findOrb(state);
     }
 
