@@ -1,17 +1,21 @@
 package student.benchmark;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
- * Stores statistics from a single search run.
+ * Stores benchmark data for a single algorithm run.
  */
+@Getter
+@Setter
 public class BenchmarkResult {
 
+    private final String algorithmName;
+
     private int moves;
+    private long runtimeMs;
 
-    public void incrementMoves() {
-        moves++;
-    }
-
-    public int getMoves() {
-        return moves;
+    public BenchmarkResult(String algorithmName) {
+        this.algorithmName = algorithmName;
     }
 }
