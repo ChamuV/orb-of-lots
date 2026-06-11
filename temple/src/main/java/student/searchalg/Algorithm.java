@@ -2,9 +2,7 @@ package student.searchalg;
 
 import game.ExplorationState;
 import student.benchmark.BenchmarkRecorder;
-import student.benchmark.BenchmarkResult;
 import student.benchmark.BenchmarkSession;
-import student.benchmark.writer.BenchmarkWriter;
 import student.benchmark.writer.CsvRunWriter;
 
 import java.nio.file.Path;
@@ -17,40 +15,28 @@ import java.nio.file.Path;
  */
 public abstract class Algorithm extends AbstractAlgorithm {
 
-    /**
-     * Default location for benchmark results.
-     */
-    private static final Path DEFAULT_RUN_OUTPUT =
-            Path.of("benchmark-data", "benchmark_runs.csv");
+    private static final Path BENCHMARK_DIR =
+            Path.of("..", "benchmark-data");
 
     private final BenchmarkSession benchmarkSession;
-
-    /**
-     * Records benchmark results after each run.
-     */
     private final BenchmarkRecorder benchmarkRecorder;
 
     protected Algorithm() {
-        this(
-                new CsvRunWriter(DEFAULT_RUN_OUTPUT)
-        );
-    }
+        String algorithmName = getClass().getSimpleName();
 
-    protected Algorithm(
-            BenchmarkWriter<BenchmarkResult> benchmarkWriter
-    ) {
         this.benchmarkSession =
-                new BenchmarkSession(
-                        getClass().getSimpleName()
-                );
+                new BenchmarkSession(algorithmName);
 
         this.benchmarkRecorder =
-                new BenchmarkRecorder(benchmarkWriter);
+                new BenchmarkRecorder(
+                        new CsvRunWriter(benchmarkPathFor(algorithmName))
+                );
     }
 
-    /**
-     * Runs the search and records benchmark information.
-     */
+    private Path benchmarkPathFor(String algorithmName) {
+        return BENCHMARK_DIR.resolve(algorithmName + ".csv");
+    }
+
     @Override
     public final void findOrb(ExplorationState state) {
         benchmarkSession.start();
@@ -64,12 +50,7 @@ public abstract class Algorithm extends AbstractAlgorithm {
         );
     }
 
-    /**
-     * Performs the algorithm-specific search logic.
-     */
-    protected abstract void runSearch(
-            ExplorationState state
-    );
+    protected abstract void runSearch(ExplorationState state);
 
     @Override
     public String getAlgorithmName() {

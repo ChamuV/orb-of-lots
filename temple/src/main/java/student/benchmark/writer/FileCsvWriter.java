@@ -6,30 +6,42 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 /**
- * Shared CSV-writing behaviour.
- *
- * @param <T> type of benchmark data written
+ * Writes CSV lines to a file.
  */
-public abstract class AbstractCsvWriter<T> implements BenchmarkWriter<T> {
+public class FileCsvWriter implements CsvWriter {
 
     private final Path outputPath;
 
-    protected AbstractCsvWriter(Path outputPath) {
+    public FileCsvWriter(Path outputPath) {
         this.outputPath = outputPath;
     }
 
-    protected void writeHeaderIfNeeded(String header) throws IOException {
+    @Override
+    public void writeHeaderIfNeeded(String header) throws IOException {
+        ensureOutputDirectoryExists();
+
         if (Files.notExists(outputPath) || Files.size(outputPath) == 0) {
             appendLine(header);
         }
     }
 
-    protected void appendLine(String line) throws IOException {
+    @Override
+    public void appendLine(String line) throws IOException {
+        ensureOutputDirectoryExists();
+
         Files.writeString(
                 outputPath,
                 line + System.lineSeparator(),
                 StandardOpenOption.CREATE,
                 StandardOpenOption.APPEND
         );
+    }
+
+    private void ensureOutputDirectoryExists() throws IOException {
+        Path parent = outputPath.getParent();
+
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
     }
 }

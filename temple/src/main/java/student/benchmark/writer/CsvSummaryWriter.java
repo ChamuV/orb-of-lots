@@ -10,19 +10,21 @@ import java.nio.file.Path;
 /**
  * Writes aggregate benchmark summaries to CSV.
  */
-public class CsvSummaryWriter extends AbstractCsvWriter<BenchmarkSummary> {
+public class CsvSummaryWriter implements BenchmarkWriter<BenchmarkSummary> {
 
     private static final AbstractCsvHeader HEADER = new SummaryCsvHeader();
 
+    private final CsvWriter csvWriter;
+
     public CsvSummaryWriter(Path outputPath) {
-        super(outputPath);
+        this.csvWriter = new FileCsvWriter(outputPath);
     }
 
     @Override
     public void write(BenchmarkSummary summary) {
         try {
-            writeHeaderIfNeeded(HEADER.value());
-            appendLine(formatRow(summary));
+            csvWriter.writeHeaderIfNeeded(HEADER.value());
+            csvWriter.appendLine(formatRow(summary));
         } catch (IOException e) {
             throw new IllegalStateException("Failed to write benchmark summary CSV", e);
         }

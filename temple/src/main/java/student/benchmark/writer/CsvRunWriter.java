@@ -10,19 +10,21 @@ import java.nio.file.Path;
 /**
  * Writes per-run benchmark results to CSV.
  */
-public class CsvRunWriter extends AbstractCsvWriter<BenchmarkResult> {
+public class CsvRunWriter implements BenchmarkWriter<BenchmarkResult> {
 
     private static final AbstractCsvHeader HEADER = new RunCsvHeader();
 
+    private final CsvWriter csvWriter;
+
     public CsvRunWriter(Path outputPath) {
-        super(outputPath);
+        this.csvWriter = new FileCsvWriter(outputPath);
     }
 
     @Override
     public void write(BenchmarkResult result) {
         try {
-            writeHeaderIfNeeded(HEADER.value());
-            appendLine(formatRow(result));
+            csvWriter.writeHeaderIfNeeded(HEADER.value());
+            csvWriter.appendLine(formatRow(result));
         } catch (IOException e) {
             throw new IllegalStateException("Failed to write benchmark run CSV", e);
         }

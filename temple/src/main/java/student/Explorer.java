@@ -40,7 +40,7 @@ public class Explorer {
      * @param state the information available at the current state
      */
     public void explore(ExplorationState state) {
-        SearchAlgorithm algorithm = new DFS();
+        SearchAlgorithm algorithm = new GreedyDFS();
         algorithm.findOrb(state);
     }
 
