@@ -8,6 +8,8 @@ import student.searchalg.SearchAlgorithm;
 import student.searchalg.dfs.GreedyDFS;
 import student.searchalg.dfs.DFS;
 import student.searchalg.bestfirst.BestFirstSearch;
+import student.searchalg.astar.AStarSearch;
+import student.searchalg.astar.WeightedAStarSearch;
 
 public class Explorer {
 
@@ -42,7 +44,7 @@ public class Explorer {
      * @param state the information available at the current state
      */
     public void explore(ExplorationState state) {
-        SearchAlgorithm algorithm = new GreedyDFS();
+        SearchAlgorithm algorithm = new WeightedAStarSearch();
         algorithm.findOrb(state);
     }
 

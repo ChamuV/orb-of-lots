@@ -13,7 +13,7 @@ import java.util.List;
  * backtracks when it reaches a dead end. It prioritises correctness over speed:
  * if the Orb is reachable, DFS will eventually find it.
  */
-public class DFS extends AbstractDFS {
+public class DFS extends BaseDFS {
 
     @Override
     protected List<NodeStatus> orderedNeighbours(ExplorationState state) {

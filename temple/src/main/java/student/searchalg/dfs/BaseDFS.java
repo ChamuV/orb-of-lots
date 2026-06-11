@@ -1,18 +1,17 @@
-package student.searchalg.bestfirst;
+package student.searchalg.dfs;
 
 import game.ExplorationState;
 import game.NodeStatus;
 import student.searchalg.Algorithm;
 
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.PriorityQueue;
+import java.util.List;
 import java.util.Set;
 
 /**
- * Common code for best-first exploration strategies.
+ * Common code for depth-first search strategies.
  */
-public abstract class AbstractBestFirstSearch extends Algorithm {
+public abstract class BaseDFS extends Algorithm {
 
     @Override
     protected void runSearch(ExplorationState state) {
@@ -27,20 +26,14 @@ public abstract class AbstractBestFirstSearch extends Algorithm {
         long currentLocation = state.getCurrentLocation();
         visited.add(currentLocation);
 
-        PriorityQueue<NodeStatus> frontier =
-                new PriorityQueue<>(neighbourComparator());
+        for (NodeStatus neighbour : orderedNeighbours(state)) {
+            long neighbourId = neighbour.nodeID();
 
-        frontier.addAll(state.getNeighbours());
-
-        while (!frontier.isEmpty()) {
-            NodeStatus next = frontier.poll();
-            long nextId = next.nodeID();
-
-            if (visited.contains(nextId)) {
+            if (visited.contains(neighbourId)) {
                 continue;
             }
 
-            state.moveTo(nextId);
+            state.moveTo(neighbourId);
             recordMove();
 
             if (search(state, visited)) {
@@ -54,5 +47,5 @@ public abstract class AbstractBestFirstSearch extends Algorithm {
         return false;
     }
 
-    protected abstract Comparator<NodeStatus> neighbourComparator();
+    protected abstract List<NodeStatus> orderedNeighbours(ExplorationState state);
 }

@@ -13,7 +13,7 @@ import java.util.List;
  * The algorithm keeps the correctness guarantee of DFS, while using the
  * distance-to-target heuristic to usually reduce unnecessary exploration.
  */
-public class GreedyDFS extends AbstractDFS {
+public class GreedyDFS extends BaseDFS {
 
     @Override
     protected List<NodeStatus> orderedNeighbours(ExplorationState state) {
