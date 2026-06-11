@@ -2,7 +2,7 @@ package student.searchalg.dfs;
 
 import game.ExplorationState;
 import game.NodeStatus;
-import student.searchalg.AbstractAlgorithm;
+import student.searchalg.Algorithm;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,15 +11,11 @@ import java.util.Set;
 /**
  * Common code for depth-first search strategies.
  */
-public abstract class AbstractDFS extends AbstractAlgorithm {
+public abstract class AbstractDFS extends Algorithm {
 
     @Override
-    public void findOrb(ExplorationState state) {
-        startBenchmark();
-
+    protected void runSearch(ExplorationState state) {
         search(state, new HashSet<>());
-
-        stopBenchmark();
     }
 
     private boolean search(ExplorationState state, Set<Long> visited) {
