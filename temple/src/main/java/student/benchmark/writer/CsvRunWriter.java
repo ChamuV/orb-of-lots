@@ -32,8 +32,9 @@ public class CsvRunWriter implements BenchmarkWriter<BenchmarkResult> {
 
     private String formatRow(BenchmarkResult result) {
         return String.format(
-                "%s,%d,%d",
+                "%s,%d,%d,%d",
                 result.getAlgorithmName(),
+                result.getSeed(),
                 result.getMoves(),
                 result.getRuntimeMs()
         );
