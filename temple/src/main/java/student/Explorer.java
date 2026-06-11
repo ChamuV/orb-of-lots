@@ -4,8 +4,10 @@ import game.EscapeState;
 import game.ExplorationState;
 
 import student.searchalg.SearchAlgorithm;
+
 import student.searchalg.dfs.GreedyDFS;
 import student.searchalg.dfs.DFS;
+import student.searchalg.bestfirst.BestFirstSearch;
 
 public class Explorer {
 
