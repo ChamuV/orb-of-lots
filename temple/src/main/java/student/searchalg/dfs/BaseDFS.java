@@ -4,48 +4,57 @@ import game.ExplorationState;
 import game.NodeStatus;
 import student.searchalg.Algorithm;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Common code for depth-first search strategies.
+ * Common code for depth-first exploration strategies.
+ *
+ * <p>Uses an explicit stack rather than recursion to avoid stack overflow
+ * on large maps. Subclasses control neighbour ordering via
+ * {@link #orderedNeighbours}, which determines which branch is explored first.
  */
 public abstract class BaseDFS extends Algorithm {
 
     @Override
     protected void runSearch(ExplorationState state) {
-        search(state, new HashSet<>());
-    }
+        Set<Long>   visited     = new HashSet<>();
+        Deque<Long> returnStack = new ArrayDeque<>();
 
-    private boolean search(ExplorationState state, Set<Long> visited) {
-        if (state.getDistanceToTarget() == 0) {
-            return true;
-        }
+        while (state.getDistanceToTarget() != 0) {
+            long current = state.getCurrentLocation();
+            visited.add(current);
 
-        long currentLocation = state.getCurrentLocation();
-        visited.add(currentLocation);
-
-        for (NodeStatus neighbour : orderedNeighbours(state)) {
-            long neighbourId = neighbour.nodeID();
-
-            if (visited.contains(neighbourId)) {
-                continue;
+            // Find the first unvisited neighbour in priority order.
+            NodeStatus next = null;
+            for (NodeStatus nb : orderedNeighbours(state)) {
+                if (!visited.contains(nb.nodeID())) {
+                    next = nb;
+                    break;
+                }
             }
 
-            state.moveTo(neighbourId);
-            recordMove();
-
-            if (search(state, visited)) {
-                return true;
+            if (next != null) {
+                // Advance to the chosen neighbour.
+                returnStack.push(current);
+                state.moveTo(next.nodeID());
+                recordMove();
+            } else {
+                // Dead end — backtrack one step.
+                if (returnStack.isEmpty()) return;
+                state.moveTo(returnStack.pop());
+                recordMove();
             }
-
-            state.moveTo(currentLocation);
-            recordMove();
         }
-
-        return false;
     }
 
+    /**
+     * Returns the neighbours of the current position in the order they
+     * should be explored. The first unvisited neighbour in this list will
+     * be chosen.
+     */
     protected abstract List<NodeStatus> orderedNeighbours(ExplorationState state);
 }

@@ -1,4 +1,4 @@
-package student.searchalg.adaptive;
+package student.searchalg.dfs;
 
 import game.ExplorationState;
 import game.NodeStatus;

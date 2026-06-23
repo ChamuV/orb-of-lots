@@ -5,12 +5,12 @@ import game.ExplorationState;
 
 import student.searchalg.SearchAlgorithm;
 
-import student.searchalg.dfs.GreedyDFS;
 import student.searchalg.dfs.DFS;
+import student.searchalg.dfs.GreedyDFS;
+import student.searchalg.dfs.AdaptiveHeuristicSearch;
 import student.searchalg.frontier.FrontierUtilitySearch;
 import student.searchalg.frontier.ReplanningFrontierUtilitySearch;
 import student.searchalg.frontier.GradientFrontierUtilitySearch;
-import student.searchalg.adaptive.AdaptiveHeuristicSearch;
 import student.searchalg.rta.RealTimeAStarSearch;
 import student.searchalg.idastar.IterativeDeepeningAStarSearch;
 
@@ -48,7 +48,7 @@ public class Explorer {
      * @param state the information available at the current state
      */
     public void explore(ExplorationState state) {
-        SearchAlgorithm algorithm = new RealTimeAStarSearch();
+        SearchAlgorithm algorithm = new AdaptiveHeuristicSearch();
         algorithm.findOrb(state);
     }
 
