@@ -2,13 +2,6 @@ package student.searchalg.frontier;
 
 import java.util.Map;
 
-/**
- * Frontier utility search with an increased travel-cost penalty.
- *
- * <p>Scores candidates as {@code orbDistance + 2 * travelCost}, strongly
- * preferring nearby frontier nodes.  Useful on maps where cross-graph
- * backtracking is expensive relative to orb-distance gains.
- */
 public class WeightedFrontierUtilitySearch extends BaseFrontierSearch {
 
     private static final double TRAVEL_WEIGHT = 2.0;
@@ -16,10 +9,11 @@ public class WeightedFrontierUtilitySearch extends BaseFrontierSearch {
     @Override
     protected double score(
             long candidate,
+            long currentLocation,
             Map<Long, Integer> travelCost,
             Map<Long, Integer> distToOrb) {
 
-        int orb    = distToOrb.getOrDefault(candidate, Integer.MAX_VALUE / 2);
+        int orb = distToOrb.getOrDefault(candidate, Integer.MAX_VALUE / 2);
         int travel = travelCost.getOrDefault(candidate, Integer.MAX_VALUE / 2);
 
         return orb + TRAVEL_WEIGHT * travel;
