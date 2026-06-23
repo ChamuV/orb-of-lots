@@ -7,14 +7,9 @@ import student.searchalg.SearchAlgorithm;
 
 import student.searchalg.dfs.GreedyDFS;
 import student.searchalg.dfs.DFS;
-import student.searchalg.bestfirst.BestFirstSearch;
-import student.searchalg.astar.AStarSearch;
-import student.searchalg.astar.WeightedAStarSearch;
 import student.searchalg.frontier.FrontierUtilitySearch;
-import student.searchalg.frontier.WeightedFrontierUtilitySearch;
 import student.searchalg.frontier.ReplanningFrontierUtilitySearch;
 import student.searchalg.frontier.GradientFrontierUtilitySearch;
-import student.searchalg.frontier.FringeSearch;
 import student.searchalg.adaptive.AdaptiveHeuristicSearch;
 import student.searchalg.rta.RealTimeAStarSearch;
 import student.searchalg.idastar.IterativeDeepeningAStarSearch;
