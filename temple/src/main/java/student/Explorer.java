@@ -12,6 +12,7 @@ import student.searchalg.astar.AStarSearch;
 import student.searchalg.astar.WeightedAStarSearch;
 import student.searchalg.frontier.FrontierUtilitySearch;
 import student.searchalg.frontier.WeightedFrontierUtilitySearch;
+import student.searchalg.frontier.ReplanningFrontierUtilitySearch;
 import student.searchalg.fringe.FringeSearch;
 import student.searchalg.adaptive.AdaptiveHeuristicSearch;
 
@@ -48,7 +49,7 @@ public class Explorer {
      * @param state the information available at the current state
      */
     public void explore(ExplorationState state) {
-        SearchAlgorithm algorithm = new AdaptiveHeuristicSearch();
+        SearchAlgorithm algorithm = new FringeSearch();
         algorithm.findOrb(state);
     }
 

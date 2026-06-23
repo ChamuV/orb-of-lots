@@ -1,41 +1,49 @@
 package student.searchalg.fringe;
 
 import game.ExplorationState;
-import game.NodeStatus;
 import student.searchalg.frontier.BaseFrontierSearch;
 
+import java.util.Map;
+
 /**
- * Frontier-based approximation of Fringe Search.
+ * Threshold-gated frontier search loosely inspired by Fringe Search.
  *
- * The algorithm evaluates frontier nodes using f = travelCost + distanceToOrb,
- * but only considers nodes within the current fringe limit. If no frontier node
- * is inside the current limit, the limit is raised to the next best available
- * f-value.
+ * <p>Scores candidates with {@code f = travelCost + orbDistance}, but
+ * suppresses candidates whose {@code f} exceeds the current threshold.
+ * The threshold starts at the lowest {@code f} seen and grows by one each
+ * time no in-threshold candidate exists, ensuring all frontier nodes are
+ * eventually considered while biasing early exploration toward low-cost paths.
  */
 public class FringeSearch extends BaseFrontierSearch {
 
-    private int fringeLimit = Integer.MAX_VALUE;
+    private int threshold = Integer.MAX_VALUE;
 
     @Override
-    protected double score(long currentLocation, long candidate) {
-        int orbDistance = distanceToOrb.getOrDefault(candidate, Integer.MAX_VALUE);
-        int travelCost = shortestPathLength(currentLocation, candidate);
+    protected double score(
+            long candidate,
+            Map<Long, Integer> travelCost,
+            Map<Long, Integer> distToOrb) {
 
-        if (travelCost == Integer.MAX_VALUE || orbDistance == Integer.MAX_VALUE) {
+        int travel = travelCost.getOrDefault(candidate, Integer.MAX_VALUE / 2);
+        int orb    = distToOrb.getOrDefault(candidate,  Integer.MAX_VALUE / 2);
+
+        if (travel == Integer.MAX_VALUE / 2 || orb == Integer.MAX_VALUE / 2) {
             return Double.MAX_VALUE;
         }
 
-        int fringeScore = travelCost + orbDistance;
+        int f = travel + orb;
 
-        if (fringeLimit == Integer.MAX_VALUE) {
-            fringeLimit = fringeScore;
+        // Initialise threshold on first scored candidate.
+        if (threshold == Integer.MAX_VALUE) {
+            threshold = f;
         }
 
-        if (fringeScore <= fringeLimit) {
-            return fringeScore;
+        if (f <= threshold) {
+            return f; // within threshold — score normally
         }
 
-        fringeLimit = Math.min(fringeLimit + 1, fringeScore);
-        return fringeScore + fringeLimit;
+        // Outside threshold — raise it and penalise so in-threshold nodes win.
+        threshold = Math.min(threshold + 1, f);
+        return f + threshold;
     }
 }

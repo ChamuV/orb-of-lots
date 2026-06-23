@@ -1,19 +1,25 @@
 package student.searchalg.frontier;
 
+import java.util.Map;
+
 /**
- * Frontier-based exploration strategy that balances orb distance with the
- * cost of travelling to a candidate node through the known graph.
+ * Frontier search that scores candidates as {@code orbDistance + travelCost}.
  *
- * This algorithm avoids chasing a slightly better-looking frontier node if it
- * would require a large amount of backtracking to reach.
+ * <p>Balances proximity to the Orb against the cost of reaching the candidate
+ * through the known graph, avoiding expensive detours to marginally
+ * better-looking frontier nodes.
  */
 public class FrontierUtilitySearch extends BaseFrontierSearch {
 
     @Override
-    protected double score(long currentLocation, long candidate) {
-        int orbDistance = distanceToOrb.getOrDefault(candidate, Integer.MAX_VALUE);
-        int travelCost = shortestPathLength(currentLocation, candidate);
+    protected double score(
+            long candidate,
+            Map<Long, Integer> travelCost,
+            Map<Long, Integer> distToOrb) {
 
-        return orbDistance + travelCost;
+        int orb    = distToOrb.getOrDefault(candidate, Integer.MAX_VALUE / 2);
+        int travel = travelCost.getOrDefault(candidate, Integer.MAX_VALUE / 2);
+
+        return orb + travel;
     }
 }
