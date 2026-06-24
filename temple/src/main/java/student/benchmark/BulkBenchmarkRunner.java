@@ -18,7 +18,7 @@ public final class BulkBenchmarkRunner {
     private static final Path SEEDS_FILE =
             Path.of("benchmark-data", "seeds.txt");
 
-    private static final int SEED_LIMIT = 50;
+    private static final int SEED_LIMIT = 100;
 
     private static final List<String> ALGORITHMS = List.of(
         "DFS",
@@ -28,10 +28,33 @@ public final class BulkBenchmarkRunner {
         "RandomWalkSearch",
         "RealTimeAStarSearch",
         "IterativeDeepeningAStarSearch",
+
         "FrontierUtilitySearch",
         "ReplanningFrontierUtilitySearch",
-        "GradientFrontierUtilitySearch",
-        "CoverageBiasedFrontierUtilitySearch"
+
+        "GradientFrontierUtilitySearch:0.5",
+        "GradientFrontierUtilitySearch:0.75",
+        "GradientFrontierUtilitySearch:1.0",
+        "GradientFrontierUtilitySearch:1.25",
+        "GradientFrontierUtilitySearch:1.5",
+        "GradientFrontierUtilitySearch:2.0",
+        "GradientFrontierUtilitySearch:3.0",
+        "GradientFrontierUtilitySearch:5.0",
+        "GradientFrontierUtilitySearch:10.0",
+
+        "CoverageBiasedFrontierUtilitySearch:0.5",
+        "CoverageBiasedFrontierUtilitySearch:1.0",
+        "CoverageBiasedFrontierUtilitySearch:1.5",
+        "CoverageBiasedFrontierUtilitySearch:2.0",
+        "CoverageBiasedFrontierUtilitySearch:3.0",
+
+        "CoverageBiasedFrontierUtilitySearch:4.0",
+        "CoverageBiasedFrontierUtilitySearch:4.5",
+        "CoverageBiasedFrontierUtilitySearch:5.0",
+        "CoverageBiasedFrontierUtilitySearch:5.5",
+        "CoverageBiasedFrontierUtilitySearch:6.0",
+
+        "CoverageBiasedFrontierUtilitySearch:10.0"
     );
 
     private BulkBenchmarkRunner() {
@@ -51,6 +74,8 @@ public final class BulkBenchmarkRunner {
             runAlgorithm(algorithmName, seeds);
         }
 
+        clearBenchmarkProperties();
+
         System.out.println("Bulk benchmark complete.");
     }
 
@@ -67,7 +92,15 @@ public final class BulkBenchmarkRunner {
     private static void runAlgorithm(String algorithmName, List<Long> seeds) {
         System.out.printf("%nAlgorithm: %s%n", algorithmName);
 
-        System.setProperty("benchmark.algorithm", algorithmName);
+        System.setProperty(
+                BenchmarkAlgorithmSelector.ALGORITHM_PROPERTY,
+                algorithmName
+        );
+
+        System.setProperty(
+                BenchmarkAlgorithmSelector.BENCHMARK_NAME_PROPERTY,
+                benchmarkNameFor(algorithmName)
+        );
 
         for (long seed : seeds) {
             System.setProperty("benchmark.seed", Long.toString(seed));
@@ -76,5 +109,17 @@ public final class BulkBenchmarkRunner {
 
             System.out.printf("  seed=%d, score=%d%n", seed, score);
         }
+    }
+
+    private static String benchmarkNameFor(String algorithmName) {
+        return algorithmName
+                .replace(':', '_')
+                .replace('.', '_');
+    }
+
+    private static void clearBenchmarkProperties() {
+        System.clearProperty(BenchmarkAlgorithmSelector.ALGORITHM_PROPERTY);
+        System.clearProperty(BenchmarkAlgorithmSelector.BENCHMARK_NAME_PROPERTY);
+        System.clearProperty("benchmark.seed");
     }
 }

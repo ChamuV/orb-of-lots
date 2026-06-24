@@ -21,6 +21,9 @@ import student.searchalg.rta.RealTimeAStarSearch;
  */
 public final class BenchmarkAlgorithmSelector {
 
+    public static final String BENCHMARK_NAME_PROPERTY =
+        "benchmark.name";
+        
     public static final String ALGORITHM_PROPERTY = "benchmark.algorithm";
 
     private BenchmarkAlgorithmSelector() {
@@ -34,6 +37,20 @@ public final class BenchmarkAlgorithmSelector {
             return defaultAlgorithm;
         }
 
+        return createAlgorithm(algorithmName);
+    }
+
+    private static SearchAlgorithm createAlgorithm(String algorithmName) {
+        if (algorithmName.startsWith("GradientFrontierUtilitySearch:")) {
+            double lambda = parseParameter(algorithmName);
+            return new GradientFrontierUtilitySearch(lambda);
+        }
+
+        if (algorithmName.startsWith("CoverageBiasedFrontierUtilitySearch:")) {
+            double mu = parseParameter(algorithmName);
+            return new CoverageBiasedFrontierUtilitySearch(mu);
+        }
+
         return switch (algorithmName) {
             case "DFS" -> new DFS();
             case "GreedyDFS" -> new GreedyDFS();
@@ -44,9 +61,23 @@ public final class BenchmarkAlgorithmSelector {
             case "IterativeDeepeningAStarSearch" -> new IterativeDeepeningAStarSearch();
             case "FrontierUtilitySearch" -> new FrontierUtilitySearch();
             case "ReplanningFrontierUtilitySearch" -> new ReplanningFrontierUtilitySearch();
-            case "GradientFrontierUtilitySearch" -> new GradientFrontierUtilitySearch(2.0);
+            case "GradientFrontierUtilitySearch" -> new GradientFrontierUtilitySearch();
             case "CoverageBiasedFrontierUtilitySearch" -> new CoverageBiasedFrontierUtilitySearch();
-            default -> throw new IllegalArgumentException("Unknown benchmark algorithm: " + algorithmName);
+            default -> throw new IllegalArgumentException(
+                    "Unknown benchmark algorithm: " + algorithmName
+            );
         };
+    }
+
+    private static double parseParameter(String algorithmName) {
+        int separator = algorithmName.indexOf(':');
+
+        if (separator < 0 || separator == algorithmName.length() - 1) {
+            throw new IllegalArgumentException(
+                    "Missing parameter in benchmark algorithm: " + algorithmName
+            );
+        }
+
+        return Double.parseDouble(algorithmName.substring(separator + 1));
     }
 }

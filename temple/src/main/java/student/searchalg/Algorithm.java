@@ -3,6 +3,7 @@ package student.searchalg;
 import game.ExplorationState;
 import student.benchmark.BenchmarkRecorder;
 import student.benchmark.BenchmarkSession;
+import student.benchmark.BenchmarkAlgorithmSelector;
 import student.benchmark.writer.CsvRunWriter;
 
 import java.nio.file.Path;
@@ -22,7 +23,10 @@ public abstract class Algorithm extends AbstractAlgorithm {
     private final BenchmarkRecorder benchmarkRecorder;
 
     protected Algorithm() {
-        String algorithmName = getClass().getSimpleName();
+        String algorithmName = System.getProperty(
+                BenchmarkAlgorithmSelector.BENCHMARK_NAME_PROPERTY,
+                getClass().getSimpleName()
+        );
 
         this.benchmarkSession =
                 new BenchmarkSession(algorithmName);
