@@ -13,7 +13,7 @@ public class BenchmarkResult {
     private final String algorithmName;
 
     private int moves;
-    private long runtimeMs;
+    private long runtimeUs;
     private long seed;
     private boolean success = true;
 

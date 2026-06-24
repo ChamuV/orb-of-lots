@@ -38,7 +38,7 @@ public class CsvSummaryWriter implements BenchmarkWriter<BenchmarkSummary> {
                 summary.getAverageMoves(),
                 summary.getBestMoves(),
                 summary.getWorstMoves(),
-                summary.getAverageRuntimeMs()
+                summary.getAverageRuntimeUs()
         );
     }
 }

@@ -13,7 +13,7 @@ public class SummaryCsvHeader extends AbstractCsvHeader {
                 "avg_moves",
                 "best_moves",
                 "worst_moves",
-                "avg_runtime_ms"
+                "avg_runtime_us"
         };
     }
 }

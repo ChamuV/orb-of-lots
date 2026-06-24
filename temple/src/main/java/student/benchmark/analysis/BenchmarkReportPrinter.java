@@ -7,41 +7,44 @@ import java.util.List;
  */
 public class BenchmarkReportPrinter {
 
-    /**
-     * Prints a ranked summary table of benchmark statistics.
-     *
-     * @param statistics per-algorithm benchmark statistics
-     */
     public void printSummary(List<BenchmarkStatistics> statistics) {
         System.out.println("Benchmark Summary");
         System.out.println("=================");
         System.out.println();
 
         System.out.printf(
-                "%-38s %5s %8s %8s %8s %8s %8s %8s%n",
+                "%-38s %5s %8s %8s %8s %8s %8s %8s %8s %8s %10s %12s%n",
                 "Algorithm",
                 "Runs",
                 "Success",
                 "Mean",
                 "Median",
                 "Std",
+                "CV",
+                "P90",
+                "P95",
                 "Best",
-                "Worst"
+                "Worst",
+                "Time(us)"
         );
 
-        System.out.println("-".repeat(100));
+        System.out.println("-".repeat(155));
 
         for (BenchmarkStatistics stats : statistics) {
             System.out.printf(
-                    "%-38s %5d %7.1f%% %8.2f %8.2f %8.2f %8d %8d%n",
+                    "%-38s %5d %7.1f%% %8.2f %8.2f %8.2f %8.3f %8.1f %8.1f %8d %10d %12.1f%n",
                     stats.algorithm(),
                     stats.runs(),
                     stats.successRate(),
                     stats.meanMoves(),
                     stats.medianMoves(),
                     stats.stdMoves(),
+                    stats.coefficientOfVariation(),
+                    stats.p90Moves(),
+                    stats.p95Moves(),
                     stats.bestMoves(),
-                    stats.worstMoves()
+                    stats.worstMoves(),
+                    stats.meanRuntimeUs()
             );
         }
 

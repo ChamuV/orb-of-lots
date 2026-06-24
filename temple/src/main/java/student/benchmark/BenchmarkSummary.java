@@ -15,7 +15,7 @@ public class BenchmarkSummary {
 
     private int worstMoves = Integer.MIN_VALUE;
 
-    private long totalRuntimeMs;
+    private long totalRuntimeUs;
 
     public BenchmarkSummary(String algorithmName) {
         this.algorithmName = algorithmName;
@@ -27,7 +27,7 @@ public class BenchmarkSummary {
 
         totalMoves += result.getMoves();
 
-        totalRuntimeMs += result.getRuntimeMs();
+        totalRuntimeUs += result.getRuntimeUs();
 
         bestMoves = Math.min(
                 bestMoves,
@@ -44,7 +44,7 @@ public class BenchmarkSummary {
         return (double) totalMoves / runCount;
     }
 
-    public double getAverageRuntimeMs() {
-        return (double) totalRuntimeMs / runCount;
+    public double getAverageRuntimeUs() {
+        return (double) totalRuntimeUs / runCount;
     }
 }

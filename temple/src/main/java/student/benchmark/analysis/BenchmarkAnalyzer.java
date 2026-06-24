@@ -11,16 +11,6 @@ import java.util.stream.Collectors;
  */
 public class BenchmarkAnalyzer {
 
-    /**
-     * Computes one statistics row per algorithm.
-     *
-     * <p>Runs with zero moves are treated as failed/invalid runs. This handles
-     * algorithms such as the current BFS implementation, which can return at
-     * the wrong location and record zero moves.
-     *
-     * @param runs benchmark runs loaded from CSV files
-     * @return per-algorithm statistics sorted by mean move count
-     */
     public List<BenchmarkStatistics> analyze(List<BenchmarkRun> runs) {
         Map<String, List<BenchmarkRun>> runsByAlgorithm =
                 runs.stream()
@@ -49,18 +39,24 @@ public class BenchmarkAnalyzer {
         int successCount = successfulRuns.size();
         int failureCount = runCount - successCount;
 
+        double mean = meanMoves(successfulRuns);
+        double std = stdMoves(successfulRuns);
+
         return new BenchmarkStatistics(
                 algorithm,
                 runCount,
                 successCount,
                 failureCount,
                 percentage(successCount, runCount),
-                meanMoves(successfulRuns),
+                mean,
                 medianMoves(successfulRuns),
-                stdMoves(successfulRuns),
+                std,
+                coefficientOfVariation(mean, std),
+                percentileMoves(successfulRuns, 0.90),
+                percentileMoves(successfulRuns, 0.95),
                 bestMoves(successfulRuns),
                 worstMoves(successfulRuns),
-                meanRuntimeMs(successfulRuns)
+                meanRuntimeUs(successfulRuns)
         );
     }
 
@@ -84,22 +80,7 @@ public class BenchmarkAnalyzer {
     }
 
     private double medianMoves(List<BenchmarkRun> runs) {
-        if (runs.isEmpty()) {
-            return 0.0;
-        }
-
-        List<Integer> moves = runs.stream()
-                .map(BenchmarkRun::moves)
-                .sorted()
-                .toList();
-
-        int middle = moves.size() / 2;
-
-        if (moves.size() % 2 == 1) {
-            return moves.get(middle);
-        }
-
-        return (moves.get(middle - 1) + moves.get(middle)) / 2.0;
+        return percentileMoves(runs, 0.50);
     }
 
     private double stdMoves(List<BenchmarkRun> runs) {
@@ -116,6 +97,36 @@ public class BenchmarkAnalyzer {
         return Math.sqrt(variance);
     }
 
+    private double coefficientOfVariation(double mean, double std) {
+        if (mean == 0.0) {
+            return 0.0;
+        }
+
+        return std / mean;
+    }
+
+    private double percentileMoves(List<BenchmarkRun> runs, double percentile) {
+        if (runs.isEmpty()) {
+            return 0.0;
+        }
+
+        List<Integer> moves = runs.stream()
+                .map(BenchmarkRun::moves)
+                .sorted()
+                .toList();
+
+        double index = percentile * (moves.size() - 1);
+        int lower = (int) Math.floor(index);
+        int upper = (int) Math.ceil(index);
+
+        if (lower == upper) {
+            return moves.get(lower);
+        }
+
+        double weight = index - lower;
+        return moves.get(lower) * (1.0 - weight) + moves.get(upper) * weight;
+    }
+
     private int bestMoves(List<BenchmarkRun> runs) {
         return runs.stream()
                 .mapToInt(BenchmarkRun::moves)
@@ -130,9 +141,9 @@ public class BenchmarkAnalyzer {
                 .orElse(0);
     }
 
-    private double meanRuntimeMs(List<BenchmarkRun> runs) {
+    private double meanRuntimeUs(List<BenchmarkRun> runs) {
         return runs.stream()
-                .mapToLong(BenchmarkRun::runtimeMs)
+                .mapToLong(BenchmarkRun::runtimeUs)
                 .average()
                 .orElse(0.0);
     }

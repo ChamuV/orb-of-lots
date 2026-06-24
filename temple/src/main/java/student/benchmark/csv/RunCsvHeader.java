@@ -12,7 +12,7 @@ public class RunCsvHeader extends AbstractCsvHeader {
                 "seed",
                 "success",
                 "moves",
-                "runtime_ms"
+                "runtime_us"
         };
     }
 }

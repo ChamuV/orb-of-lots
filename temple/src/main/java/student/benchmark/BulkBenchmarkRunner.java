@@ -18,7 +18,7 @@ public final class BulkBenchmarkRunner {
     private static final Path SEEDS_FILE =
             Path.of("benchmark-data", "seeds.txt");
 
-    private static final int SEED_LIMIT = 100;
+    private static final int SEED_LIMIT = 500;
 
     private static final List<String> ALGORITHMS = List.of(
         "DFS",

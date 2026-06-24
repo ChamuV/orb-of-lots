@@ -50,7 +50,7 @@ public class BenchmarkSession {
 
     public void stop() {
         timer.stop();
-        result.setRuntimeMs(timer.getElapsedMilliseconds());
+        result.setRuntimeUs(timer.getElapsedMicroseconds());
         result.setMoves(moveCounter.getValue());
     }
 

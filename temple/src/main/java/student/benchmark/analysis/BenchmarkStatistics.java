@@ -12,8 +12,11 @@ public record BenchmarkStatistics(
         double meanMoves,
         double medianMoves,
         double stdMoves,
+        double coefficientOfVariation,
+        double p90Moves,
+        double p95Moves,
         int bestMoves,
         int worstMoves,
-        double meanRuntimeMs
+        double meanRuntimeUs
 ) {
 }

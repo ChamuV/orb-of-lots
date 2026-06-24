@@ -19,7 +19,7 @@ public class NanoTimer implements Timer {
     }
 
     @Override
-    public long getElapsedMilliseconds() {
-        return (endTimeNs - startTimeNs) / 1_000_000;
+    public long getElapsedMicroseconds() {
+        return (endTimeNs - startTimeNs) / 1_000;
     }
 }

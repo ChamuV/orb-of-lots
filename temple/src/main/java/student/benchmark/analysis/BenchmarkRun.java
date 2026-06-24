@@ -8,6 +8,6 @@ public record BenchmarkRun(
         long seed,
         boolean success,
         int moves,
-        long runtimeMs
+        long runtimeUs
 ) {
 }

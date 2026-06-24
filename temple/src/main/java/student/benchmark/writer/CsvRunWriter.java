@@ -37,7 +37,7 @@ public class CsvRunWriter implements BenchmarkWriter<BenchmarkResult> {
                 result.getSeed(),
                 result.isSuccess(),
                 result.getMoves(),
-                result.getRuntimeMs()
+                result.getRuntimeUs()
         );
     }
 }
