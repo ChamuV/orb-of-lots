@@ -15,6 +15,7 @@ public class BenchmarkResult {
     private int moves;
     private long runtimeMs;
     private long seed;
+    private boolean success = true;
 
     public BenchmarkResult(String algorithmName) {
         this.algorithmName = algorithmName;

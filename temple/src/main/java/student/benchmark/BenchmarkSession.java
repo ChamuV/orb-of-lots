@@ -32,6 +32,10 @@ public class BenchmarkSession {
         this.moveCounter = moveCounter;
     }
 
+    public void setSeed(long seed) {
+    result.setSeed(seed);
+    }
+
     public void start() {
         timer.start();
     }

@@ -16,7 +16,7 @@ import java.nio.file.Path;
 public abstract class Algorithm extends AbstractAlgorithm {
 
     private static final Path BENCHMARK_DIR =
-            Path.of("..", "benchmark-data");
+            Path.of("benchmark-data");
 
     private final BenchmarkSession benchmarkSession;
     private final BenchmarkRecorder benchmarkRecorder;
