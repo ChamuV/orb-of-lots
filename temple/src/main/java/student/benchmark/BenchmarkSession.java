@@ -33,7 +33,15 @@ public class BenchmarkSession {
     }
 
     public void setSeed(long seed) {
-    result.setSeed(seed);
+        result.setSeed(seed);
+    }
+
+    public void markSuccess() {
+        result.setSuccess(true);
+    }
+
+    public void markFailure() {
+        result.setSuccess(false);
     }
 
     public void start() {

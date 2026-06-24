@@ -10,6 +10,7 @@ public class RunCsvHeader extends AbstractCsvHeader {
         return new String[]{
                 "algorithm",
                 "seed",
+                "success",
                 "moves",
                 "runtime_ms"
         };
