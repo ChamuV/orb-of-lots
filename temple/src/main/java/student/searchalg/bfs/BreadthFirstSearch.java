@@ -17,111 +17,169 @@ import java.util.Set;
 /**
  * Breadth-first search exploration strategy.
  *
- * <p>Maintains a queue of discovered-but-unvisited nodes ordered by the number
- * of hops from the start, and always expands the shallowest node next. In an
- * offline graph search this guarantees the shortest path to the goal.
+ * <p>This implementation builds an internal graph of the explored cavern and
+ * expands nodes in breadth-first order. Because movement in the game is
+ * physical rather than abstract, the explorer must repeatedly navigate across
+ * the known graph to reach the next node selected by the BFS frontier.</p>
  *
- * <p><b>Why this performs poorly in practice.</b> Standard BFS assumes node
- * expansion is free. Here the explorer must physically walk to each node before
- * expanding it, and those travel moves count toward the final score. Expanding
- * the shallowest node often requires crossing the entire known graph, producing
- * large travel overhead. On a map of N nodes BFS makes O(N²) physical moves in
- * the worst case — quadratic in map size — compared with O(N) for DFS-based
- * strategies.
- *
- * <p>This implementation is included as an experimental lower bound to
- * demonstrate that algorithmic optimality in the abstract does not translate
- * to optimality under physical movement constraints. The contrast with
- * {@code FrontierUtilitySearch} — which also selects targets globally but
- * scores them by travel cost — illustrates why travel-cost-aware target
- * selection is essential.
+ * <p>This strategy is included primarily as a baseline for comparison with
+ * the depth-first and travel-aware exploration algorithms.</p>
  */
 public class BreadthFirstSearch extends Algorithm {
 
-    private final Map<Long, Set<Long>> knownGraph  = new HashMap<>();
-    private final Set<Long>            visited     = new HashSet<>();
-    private final Queue<Long>          bfsQueue    = new LinkedList<>();
+    /** Adjacency list representing the explored portion of the cavern. */
+    private final Map<Long, Set<Long>> knownGraph = new HashMap<>();
 
+    /** Nodes that have already been expanded by the BFS search. */
+    private final Set<Long> visited = new HashSet<>();
+
+    /** Queue of discovered nodes awaiting expansion. */
+    private final Queue<Long> bfsQueue = new LinkedList<>();
+
+    /**
+     * Explores the cavern using a breadth-first search strategy.
+     *
+     * <p>The algorithm expands nodes in order of increasing graph distance
+     * from the starting location. When the next frontier node is selected,
+     * the explorer physically travels to that node using the shortest known
+     * path before continuing the search.</p>
+     *
+     * @param state the current exploration state
+     */
     @Override
     protected void runSearch(ExplorationState state) {
         updateModel(state);
         bfsQueue.add(state.getCurrentLocation());
 
         while (state.getDistanceToTarget() != 0) {
-
-            // Find the next queued node that hasn't been visited yet.
             Long target = null;
+
+            // Find the next queued node that has not already been expanded.
             while (!bfsQueue.isEmpty()) {
                 long candidate = bfsQueue.peek();
+
                 if (!visited.contains(candidate)) {
                     target = candidate;
                     break;
                 }
+
                 bfsQueue.poll();
             }
 
-            if (target == null) return; // queue exhausted
+            if (target == null) {
+                return;
+            }
 
-            // Physically navigate to the target.
             List<Long> path = shortestPath(state.getCurrentLocation(), target);
+
             for (long step : path) {
-                if (step == state.getCurrentLocation()) continue;
+                if (step == state.getCurrentLocation()) {
+                    continue;
+                }
+
                 state.moveTo(step);
                 recordMove();
                 updateModel(state);
-                if (state.getDistanceToTarget() == 0) return;
+
+                if (state.getDistanceToTarget() == 0) {
+                    return;
+                }
             }
 
-            // Mark visited and enqueue newly discovered neighbours.
-            bfsQueue.poll(); // remove the target we just reached
-            for (long nb : knownGraph.getOrDefault(target, Set.of())) {
-                if (!visited.contains(nb)) {
-                    bfsQueue.add(nb);
+            bfsQueue.poll();
+
+            for (long neighbour : knownGraph.getOrDefault(target, Set.of())) {
+                if (!visited.contains(neighbour)) {
+                    bfsQueue.add(neighbour);
                 }
             }
         }
     }
 
+    /**
+     * Updates the internal graph with information visible from the current node.
+     *
+     * <p>Newly discovered nodes and connections are added to the explored graph,
+     * allowing future navigation and breadth-first expansion.</p>
+     *
+     * @param state the current exploration state
+     */
     private void updateModel(ExplorationState state) {
         long here = state.getCurrentLocation();
         visited.add(here);
-        knownGraph.computeIfAbsent(here, k -> new HashSet<>());
+        knownGraph.computeIfAbsent(here, key -> new HashSet<>());
 
-        for (NodeStatus nb : state.getNeighbours()) {
-            long nbId = nb.nodeID();
-            knownGraph.computeIfAbsent(nbId, k -> new HashSet<>());
-            knownGraph.get(here).add(nbId);
-            knownGraph.get(nbId).add(here);
+        for (NodeStatus neighbour : state.getNeighbours()) {
+            long neighbourId = neighbour.nodeID();
+
+            knownGraph.computeIfAbsent(neighbourId, key -> new HashSet<>());
+            knownGraph.get(here).add(neighbourId);
+            knownGraph.get(neighbourId).add(here);
         }
     }
 
+    /**
+     * Computes the shortest known path between two explored nodes.
+     *
+     * <p>The search is performed over the currently known graph using a
+     * standard breadth-first search.</p>
+     *
+     * @param start the starting node ID
+     * @param target the destination node ID
+     * @return the shortest known path from {@code start} to {@code target},
+     *         or an empty list if no path is currently known
+     */
     private List<Long> shortestPath(long start, long target) {
-        if (start == target) return List.of(start);
+        if (start == target) {
+            return List.of(start);
+        }
 
-        Queue<Long>     queue  = new LinkedList<>();
+        Queue<Long> queue = new LinkedList<>();
         Map<Long, Long> parent = new HashMap<>();
-        Set<Long>       seen   = new HashSet<>();
+        Set<Long> seen = new HashSet<>();
 
         queue.add(start);
         seen.add(start);
 
         while (!queue.isEmpty()) {
-            long cur = queue.remove();
-            for (long nb : knownGraph.getOrDefault(cur, Set.of())) {
-                if (seen.contains(nb)) continue;
-                seen.add(nb);
-                parent.put(nb, cur);
-                if (nb == target) return reconstructPath(parent, start, target);
-                queue.add(nb);
+            long current = queue.remove();
+
+            for (long neighbour : knownGraph.getOrDefault(current, Set.of())) {
+                if (seen.contains(neighbour)) {
+                    continue;
+                }
+
+                seen.add(neighbour);
+                parent.put(neighbour, current);
+
+                if (neighbour == target) {
+                    return reconstructPath(parent, start, target);
+                }
+
+                queue.add(neighbour);
             }
         }
+
         return Collections.emptyList();
     }
 
+    /**
+     * Reconstructs a shortest path from the parent map produced by the graph search.
+     *
+     * @param parent parent relationship recorded during the search
+     * @param start the starting node ID
+     * @param target the destination node ID
+     * @return the reconstructed path from {@code start} to {@code target}
+     */
     private List<Long> reconstructPath(Map<Long, Long> parent, long start, long target) {
         List<Long> path = new ArrayList<>();
-        long cur = target;
-        while (cur != start) { path.add(cur); cur = parent.get(cur); }
+        long current = target;
+
+        while (current != start) {
+            path.add(current);
+            current = parent.get(current);
+        }
+
         path.add(start);
         Collections.reverse(path);
         return path;

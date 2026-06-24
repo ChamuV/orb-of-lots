@@ -7,14 +7,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Basic depth-first search exploration strategy.
+ * Standard depth-first search exploration strategy.
  *
- * This algorithm systematically explores unvisited neighbouring tiles and
- * backtracks when it reaches a dead end. It prioritises correctness over speed:
- * if the Orb is reachable, DFS will eventually find it.
+ * <p>This implementation explores neighbouring nodes in the order provided
+ * by the game engine. It performs no additional heuristic ordering, making
+ * it a baseline DFS strategy for comparison with more informed variants.</p>
  */
 public class DFS extends BaseDFS {
 
+    /**
+     * Returns neighbouring nodes in their original order.
+     *
+     * @param state the current exploration state
+     * @return the neighbouring nodes without reordering
+     */
     @Override
     protected List<NodeStatus> orderedNeighbours(ExplorationState state) {
         return new ArrayList<>(state.getNeighbours());

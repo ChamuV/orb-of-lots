@@ -12,85 +12,91 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Iterative Deepening A* (IDA*) exploration strategy.
+ * Iterative Deepening A* exploration strategy.
  *
- * <p>IDA* runs a cost-bounded depth-first search repeatedly. Each iteration
- * uses an f-cost threshold: a branch is pruned whenever
- * {@code f(n) = g(n) + h(n)} exceeds the threshold, where {@code g(n)} is
- * the number of moves made from the start of this iteration and {@code h(n)}
- * is the game's distance-to-target heuristic. If the Orb is not found, the
- * threshold is raised to the smallest f-value that was pruned, and the search
- * restarts from the current position.
+ * <p>This strategy repeatedly performs a cost-bounded depth-first search.
+ * Each iteration uses an {@code f = g + h} threshold, where {@code g} is the
+ * number of moves made during the current iteration and {@code h} is the
+ * game's distance-to-target heuristic.</p>
  *
- * <h2>Key difference from AStarSearch in this project</h2>
- * <p>{@code AStarSearch} tracks recursion depth as a proxy for path cost.
- * IDA* tracks actual moves taken ({@code g}), making the cost accounting
- * correct. The pruning is therefore meaningful: branches where the optimistic
- * total cost already exceeds the budget are genuinely skipped.
- *
- * <h2>API compromise</h2>
- * <p>In offline IDA* a failed iteration is simply discarded and the search
- * restarts from the root at zero cost. Here the explorer must physically
- * retrace its path back to the starting position, which costs moves that are
- * counted in the final score. IDA* therefore performs best when the Orb is
- * found within the first one or two threshold levels. On large maps requiring
- * many restarts the retrace overhead can exceed the savings from pruning.
+ * <p>This implementation is included as a heuristic search baseline. Because
+ * the explorer must physically move and backtrack in the cavern, repeated
+ * threshold increases can introduce substantial movement overhead.</p>
  */
 public class IterativeDeepeningAStarSearch extends Algorithm {
 
+    /** Sentinel value returned when the Orb has been found. */
     private static final int FOUND = -1;
 
+    /**
+     * Explores the cavern using iterative deepening A* search.
+     *
+     * <p>The search begins with the current distance-to-target estimate as
+     * the initial threshold. If an iteration fails to find the Orb, the
+     * threshold is raised to the smallest pruned f-cost and the explorer
+     * retraces back to the iteration start before searching again.</p>
+     *
+     * @param state the current exploration state
+     */
     @Override
     protected void runSearch(ExplorationState state) {
         long startNode = state.getCurrentLocation();
-        int  threshold = state.getDistanceToTarget();
+        int threshold = state.getDistanceToTarget();
 
         while (true) {
-            // pathStack records the forward path taken this iteration so we
-            // can retrace back to startNode if this iteration fails.
             Deque<Long> pathStack = new ArrayDeque<>();
-            Set<Long>   visited   = new HashSet<>();
+            Set<Long> visited = new HashSet<>();
 
             int result = search(state, visited, pathStack, 0, threshold);
 
-            if (result == FOUND) return;
-            if (result == Integer.MAX_VALUE) return; // graph exhausted
+            if (result == FOUND) {
+                return;
+            }
 
-            // Retrace back to startNode before raising the threshold.
+            if (result == Integer.MAX_VALUE) {
+                return;
+            }
+
             retrace(state, pathStack, startNode);
-
             threshold = result;
         }
     }
 
     /**
-     * Recursive cost-bounded DFS.
+     * Performs a recursive cost-bounded depth-first search.
      *
-     * @param state     current exploration state
-     * @param visited   nodes already on the current path (cycle prevention)
-     * @param pathStack nodes traversed this iteration, for retracing
-     * @param g         moves taken from the iteration start node
-     * @param threshold f-cost pruning threshold
-     * @return {@link #FOUND} if the Orb is reached; otherwise the minimum
-     *         f-cost that caused pruning (used as the next threshold)
+     * <p>A branch is pruned when its estimated total cost exceeds the current
+     * threshold. The method returns the smallest f-cost that was pruned, which
+     * is then used as the threshold for the next iteration.</p>
+     *
+     * @param state the current exploration state
+     * @param visited nodes already on the current search path
+     * @param pathStack path travelled during the current iteration
+     * @param g moves taken from the iteration start node
+     * @param threshold current f-cost pruning threshold
+     * @return {@link #FOUND} if the Orb is reached; otherwise the smallest
+     *         pruned f-cost observed during this search
      */
     private int search(
             ExplorationState state,
-            Set<Long>        visited,
-            Deque<Long>      pathStack,
-            int              g,
-            int              threshold
+            Set<Long> visited,
+            Deque<Long> pathStack,
+            int g,
+            int threshold
     ) {
-        if (state.getDistanceToTarget() == 0) return FOUND;
+        if (state.getDistanceToTarget() == 0) {
+            return FOUND;
+        }
 
         long current = state.getCurrentLocation();
-        int  f       = g + state.getDistanceToTarget();
+        int f = g + state.getDistanceToTarget();
 
-        if (f > threshold) return f;
+        if (f > threshold) {
+            return f;
+        }
 
         visited.add(current);
 
-        // Sort neighbours by f-value so the most promising branch is tried first.
         List<NodeStatus> neighbours = new ArrayList<>(state.getNeighbours());
         neighbours.sort((a, b) -> Integer.compare(
                 (g + 1) + a.distanceToTarget(),
@@ -99,24 +105,30 @@ public class IterativeDeepeningAStarSearch extends Algorithm {
 
         int minPruned = Integer.MAX_VALUE;
 
-        for (NodeStatus nb : neighbours) {
-            long nbId = nb.nodeID();
-            if (visited.contains(nbId)) continue;
+        for (NodeStatus neighbour : neighbours) {
+            long neighbourId = neighbour.nodeID();
 
-            state.moveTo(nbId);
+            if (visited.contains(neighbourId)) {
+                continue;
+            }
+
+            state.moveTo(neighbourId);
             recordMove();
             pathStack.push(current);
 
             int result = search(state, visited, pathStack, g + 1, threshold);
 
-            if (result == FOUND) return FOUND;
+            if (result == FOUND) {
+                return FOUND;
+            }
 
-            // Backtrack physically.
             state.moveTo(current);
             recordMove();
             pathStack.pop();
 
-            if (result < minPruned) minPruned = result;
+            if (result < minPruned) {
+                minPruned = result;
+            }
         }
 
         visited.remove(current);
@@ -124,19 +136,29 @@ public class IterativeDeepeningAStarSearch extends Algorithm {
     }
 
     /**
-     * Physically moves the explorer back to {@code startNode} by following
-     * the recorded path in reverse.
+     * Moves the explorer back to the iteration start node.
+     *
+     * <p>The path travelled during the failed iteration is followed in reverse
+     * so that the next threshold level begins from the same start location.</p>
+     *
+     * @param state the current exploration state
+     * @param pathStack path travelled during the current iteration
+     * @param startNode node ID where the current iteration began
      */
     private void retrace(
             ExplorationState state,
-            Deque<Long>      pathStack,
-            long             startNode
+            Deque<Long> pathStack,
+            long startNode
     ) {
         while (!pathStack.isEmpty()) {
             long step = pathStack.pop();
+
             state.moveTo(step);
             recordMove();
-            if (step == startNode) break;
+
+            if (step == startNode) {
+                break;
+            }
         }
     }
 }

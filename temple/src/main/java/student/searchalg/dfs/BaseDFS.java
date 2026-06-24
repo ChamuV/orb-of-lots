@@ -11,24 +11,29 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Common code for depth-first exploration strategies.
+ * Base class for depth-first search exploration strategies.
  *
- * <p>Uses an explicit stack rather than recursion to avoid stack overflow
- * on large maps. Subclasses control neighbour ordering via
- * {@link #orderedNeighbours}, which determines which branch is explored first.
+ * <p>This class implements the common depth-first search logic using an
+ * explicit stack to record the traversal path for backtracking. Subclasses
+ * define how neighbouring nodes are ordered, allowing different DFS
+ * variants to share the same traversal algorithm while using different
+ * neighbour selection heuristics.</p>
  */
 public abstract class BaseDFS extends Algorithm {
 
     @Override
     protected void runSearch(ExplorationState state) {
-        Set<Long>   visited     = new HashSet<>();
+        // Nodes that have already been explored.
+        Set<Long> visited = new HashSet<>();
+
+        // Path used to backtrack when a dead end is reached.
         Deque<Long> returnStack = new ArrayDeque<>();
 
         while (state.getDistanceToTarget() != 0) {
             long current = state.getCurrentLocation();
             visited.add(current);
 
-            // Find the first unvisited neighbour in priority order.
+            // Select the highest-priority unexplored neighbour.
             NodeStatus next = null;
             for (NodeStatus nb : orderedNeighbours(state)) {
                 if (!visited.contains(nb.nodeID())) {
@@ -38,13 +43,16 @@ public abstract class BaseDFS extends Algorithm {
             }
 
             if (next != null) {
-                // Advance to the chosen neighbour.
+                // Continue exploring along the selected branch.
                 returnStack.push(current);
                 state.moveTo(next.nodeID());
                 recordMove();
             } else {
-                // Dead end — backtrack one step.
-                if (returnStack.isEmpty()) return;
+                // No unexplored neighbours remain, so backtrack.
+                if (returnStack.isEmpty()) {
+                    return;
+                }
+
                 state.moveTo(returnStack.pop());
                 recordMove();
             }
@@ -52,9 +60,13 @@ public abstract class BaseDFS extends Algorithm {
     }
 
     /**
-     * Returns the neighbours of the current position in the order they
-     * should be explored. The first unvisited neighbour in this list will
-     * be chosen.
+     * Returns the neighbouring nodes in the order they should be explored.
+     *
+     * <p>The first unvisited neighbour in the returned list will be selected
+     * as the next node to visit.</p>
+     *
+     * @param state the current exploration state
+     * @return an ordered list of neighbouring nodes
      */
     protected abstract List<NodeStatus> orderedNeighbours(ExplorationState state);
 }
