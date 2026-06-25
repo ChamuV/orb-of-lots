@@ -10,7 +10,7 @@ This project implements an autonomous agent that locates a hidden Orb inside an 
 
 The core challenge is an **online graph search problem**: unlike classical search, there is no complete graph to reason over upfront. Every algorithm must be evaluated on how efficiently it explores an unknown space, not just how well it routes through a known one.
 
-After investigating several algorithm families — baselines, heuristic online search, and frontier utility search — a novel algorithm was developed within the frontier family and selected as the final strategy based on empirical benchmarking.
+The project covers algorithm design across several families, rigorous benchmarking over fixed random seeds, and a documented rationale for the final strategy selected.
 
 ---
 
@@ -27,34 +27,6 @@ Global graph structure is **not available in advance**. This rules out classical
 
 ---
 
-## Selected Algorithm
-
-The selected strategy is **Coverage-Biased Frontier Utility Search**, a novel algorithm developed from the frontier utility search family. Rather than choosing the next move based on local information alone, it maintains an explicit frontier — the set of all discovered but not yet visited nodes — and selects the best target globally at each decision point.
-
-The scoring function for each frontier candidate n is:
-
-```
-score(n) = h(n) + d(p, n) - μ · δ(n)
-```
-
-Where:
-- **h(n)** — heuristic distance from n to the Orb
-- **d(p, n)** — exact BFS travel cost from the agent's current position p to n
-- **δ(n)** — local frontier density: the number of n's known neighbours also in the frontier
-- **μ** — coverage weight; controls how strongly unexplored boundary regions are preferred
-
-The agent selects the frontier node n\* that minimises this score:
-
-```
-n* = argmin_{n ∈ V_f} [ h(n) + d(p, n) - μ · δ(n) ]
-```
-
-The coverage bonus μ · δ(n) rewards nodes that sit at the boundary of unexplored clusters, reducing catastrophic outcomes on seeds where the Orb is in a region the agent would otherwise reach last. The parameter μ was selected by systematic sweep across eleven values over 500 fixed seeds. μ = 1.0 produced the best mean move count (55.86) and the lowest worst-case of any algorithm tested (274 moves).
-
-Full mathematical treatment, architecture, and parameter selection rationale are in [`docs/final-selection.md`](docs/final-selection.md).
-
----
-
 ## Algorithm Investigation
 
 Algorithms were investigated across four families, with each family motivated by a different approach to the explore/exploit trade-off inherent in online search.
@@ -64,22 +36,34 @@ Algorithms were investigated across four families, with each family motivated by
 | Baseline | DFS, Greedy DFS, BFS, Random Walk |
 | Heuristic online search | Real-Time A* (RTA*), IDA* |
 | Frontier utility search | FrontierUtilitySearch, ReplanningFrontierUtilitySearch |
-| Frontier utility variants | GradientFrontierUtilitySearch (λ variants), CoverageBiasedFrontierSearch (μ variants) |
+| Frontier utility variants | GradientFrontierUtilitySearch (λ = 1.5, 2.0, 3.0), CoverageBiasedFrontierSearch (μ = 0, 1.0, 1.5) |
 
-Several candidates were eliminated during development — either structurally incompatible with the online setting (bidirectional search requires a known goal) or outperformed without sufficient justification for their complexity. Full design history is in [`docs/algorithm-families.md`](docs/algorithm-families.md).
+Several candidate algorithms were designed, implemented, and subsequently **eliminated** during development — either because they were structurally unsound for the online setting (e.g. bidirectional search requires a known goal), or because their performance did not justify their complexity. The full design history is documented in [`docs/algorithm-families.md`](docs/algorithm-families.md).
+
+---
+
+## Final Exploration Strategy
+
+**Selected algorithm:** _To be completed after benchmarking._
+
+The selection criteria, established prior to running benchmarks to avoid post-hoc rationalisation, are:
+
+1. **Average move count** — primary metric; lower is better
+2. **Worst-case move count** — robustness across difficult seeds
+3. **Coefficient of variation** — consistency across the seed set
+4. **Runtime reliability** — must complete within the 10-second limit across all seeds
+
+The final algorithm selection, benchmarking results, and decision rationale are documented in [`docs/final-selection.md`](docs/final-selection.md).
 
 ---
 
 ## Benchmarking
 
-Each algorithm was evaluated over 500 fixed random seeds in a single JVM invocation to eliminate warm-up variance. The selection criteria, defined before benchmarking began:
+Benchmarks are run over a fixed set of random seeds to ensure fair, reproducible comparisons. All algorithms are evaluated in a single JVM invocation to eliminate warm-up variance.
 
-1. **Mean move count** — primary metric
-2. **Worst-case move count** — robustness across difficult seeds
-3. **Coefficient of variation** — consistency across the seed set
-4. **Runtime reliability** — must complete within the 10-second limit
+Results are recorded per-algorithm as CSV files containing move count and runtime per seed. A summary across algorithms is written to `benchmark-data/summary.csv`.
 
-Coverage-Biased Frontier Utility Search (μ=1.0) was selected: best mean within the frontier family and the lowest worst-case of any algorithm tested (274 moves — a 31% reduction over the nearest competitor). Full results and methodology are in [`docs/benchmarking.md`](docs/benchmarking.md).
+Full methodology, seed lists, and results tables are in [`docs/benchmarking.md`](docs/benchmarking.md).
 
 ---
 
