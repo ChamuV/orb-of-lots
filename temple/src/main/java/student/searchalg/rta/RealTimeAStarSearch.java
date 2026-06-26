@@ -57,10 +57,14 @@ public class RealTimeAStarSearch extends Algorithm {
                 }
             }
 
+            if (best == null) {
+                return;
+            }
+            
             if (bestF > heuristic.getOrDefault(current, 0)) {
                 heuristic.put(current, bestF);
             }
-
+            
             state.moveTo(best.nodeID());
             recordMove();
         }
