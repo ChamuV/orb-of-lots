@@ -3,6 +3,8 @@ package student.searchalg.random;
 import game.ExplorationState;
 import game.NodeStatus;
 import student.searchalg.Algorithm;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +28,14 @@ import java.util.Set;
  * <p>A fixed random seed is used so that benchmark results are reproducible.</p>
  */
 public class RandomWalkSearch extends Algorithm {
+
+    public RandomWalkSearch() {
+        super();
+    }
+
+    RandomWalkSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     /** Fixed seed used to make random choices reproducible. */
     private static final long RANDOM_SEED = 42L;

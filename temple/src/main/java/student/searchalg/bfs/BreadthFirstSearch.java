@@ -3,6 +3,8 @@ package student.searchalg.bfs;
 import game.ExplorationState;
 import game.NodeStatus;
 import student.searchalg.Algorithm;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +34,14 @@ import java.util.Set;
  * and frontier-based exploration algorithms.</p>
  */
 public class BreadthFirstSearch extends Algorithm {
+
+    public BreadthFirstSearch() {
+        super();
+    }
+
+    BreadthFirstSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     /** Adjacency list representing the explored portion of the cavern. */
     private final Map<Long, Set<Long>> knownGraph = new HashMap<>();

@@ -3,6 +3,8 @@ package student.searchalg.rta;
 import game.ExplorationState;
 import game.NodeStatus;
 import student.searchalg.Algorithm;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,6 +23,14 @@ import java.util.Map;
  * are less promising than they first appeared.</p>
  */
 public class RealTimeAStarSearch extends Algorithm {
+
+    public RealTimeAStarSearch() {
+        super();
+    }
+
+    RealTimeAStarSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     /** Learned heuristic estimates indexed by node ID. */
     private final Map<Long, Integer> heuristic = new HashMap<>();

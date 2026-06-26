@@ -3,6 +3,8 @@ package student.searchalg.idastar;
 import game.ExplorationState;
 import game.NodeStatus;
 import student.searchalg.Algorithm;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -24,6 +26,14 @@ import java.util.Set;
  * threshold increases can introduce substantial movement overhead.</p>
  */
 public class IterativeDeepeningAStarSearch extends Algorithm {
+
+    public IterativeDeepeningAStarSearch() {
+        super();
+    }
+
+    IterativeDeepeningAStarSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     /** Sentinel value returned when the Orb has been found. */
     private static final int FOUND = -1;
