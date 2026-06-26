@@ -44,14 +44,18 @@ public abstract class Algorithm extends AbstractAlgorithm {
     @Override
     public final void findOrb(ExplorationState state) {
         benchmarkSession.start();
-
+    
         runSearch(state);
-
+    
         benchmarkSession.stop();
-
-        benchmarkRecorder.record(
-                benchmarkSession.getResult()
-        );
+    
+        if (state.getDistanceToTarget() == 0) {
+            benchmarkSession.markSuccess();
+        } else {
+            benchmarkSession.markFailure();
+        }
+    
+        benchmarkRecorder.record(benchmarkSession.getResult());
     }
 
     protected abstract void runSearch(ExplorationState state);
