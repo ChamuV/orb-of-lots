@@ -2,6 +2,8 @@ package student.searchalg.dfs;
 
 import game.ExplorationState;
 import game.NodeStatus;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,14 @@ import java.util.List;
  * depth-first traversal behaviour.</p>
  */
 public class GreedyDFS extends BaseDFS {
+
+    public GreedyDFS() {
+        super();
+    }
+
+    GreedyDFS(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     /**
      * Returns neighbouring nodes ordered by their estimated distance to the Orb.

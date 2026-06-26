@@ -1,12 +1,23 @@
 package student.searchalg.frontier;
 
 import game.ExplorationState;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.Map;
 
 public class ReplanningFrontierUtilitySearch extends BaseFrontierSearch {
 
     private static final double REPLAN_MARGIN = 1.0;
+
+    public ReplanningFrontierUtilitySearch() {
+        super();
+    }
+
+    ReplanningFrontierUtilitySearch(
+            BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     @Override
     protected double score(

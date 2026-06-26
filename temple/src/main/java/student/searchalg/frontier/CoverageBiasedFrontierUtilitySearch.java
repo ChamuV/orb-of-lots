@@ -1,5 +1,8 @@
 package student.searchalg.frontier;
 
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
+
 import java.util.Map;
 
 /**
@@ -26,6 +29,20 @@ public class CoverageBiasedFrontierUtilitySearch extends BaseFrontierSearch {
     public CoverageBiasedFrontierUtilitySearch(double mu) {
         if (mu < 0) {
             throw new IllegalArgumentException("mu must be non-negative; got " + mu);
+        }
+
+        this.mu = mu;
+    }
+
+    protected CoverageBiasedFrontierUtilitySearch(
+            double mu,
+            BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+
+        super(benchmarkWriter);
+
+        if (mu < 0) {
+            throw new IllegalArgumentException(
+                    "mu must be non-negative; got " + mu);
         }
 
         this.mu = mu;

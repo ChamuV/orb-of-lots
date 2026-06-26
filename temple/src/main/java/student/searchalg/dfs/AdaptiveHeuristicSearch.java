@@ -2,6 +2,8 @@ package student.searchalg.dfs;
 
 import game.ExplorationState;
 import game.NodeStatus;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,6 +23,14 @@ public class AdaptiveHeuristicSearch extends BaseDFS {
 
     /** Learned heuristic estimates indexed by node ID. */
     private final Map<Long, Integer> learnedHeuristic = new HashMap<>();
+
+    public AdaptiveHeuristicSearch() {
+        super();
+    }
+
+    AdaptiveHeuristicSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     /**
      * Returns neighbouring nodes ordered by their learned heuristic estimate.

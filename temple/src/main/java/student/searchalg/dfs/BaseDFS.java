@@ -2,6 +2,8 @@ package student.searchalg.dfs;
 
 import game.ExplorationState;
 import game.NodeStatus;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 import student.searchalg.Algorithm;
 
 import java.util.ArrayDeque;
@@ -20,6 +22,14 @@ import java.util.Set;
  * neighbour selection heuristics.</p>
  */
 public abstract class BaseDFS extends Algorithm {
+
+    protected BaseDFS() {
+        super();
+    }
+
+    BaseDFS(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     @Override
     protected void runSearch(ExplorationState state) {

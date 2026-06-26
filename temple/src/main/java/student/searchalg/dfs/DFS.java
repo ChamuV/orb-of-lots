@@ -2,6 +2,8 @@ package student.searchalg.dfs;
 
 import game.ExplorationState;
 import game.NodeStatus;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,14 @@ import java.util.List;
  * it a baseline DFS strategy for comparison with more informed variants.</p>
  */
 public class DFS extends BaseDFS {
+
+    public DFS() {
+        super();
+    }
+
+    DFS(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     /**
      * Returns neighbouring nodes in their original order.

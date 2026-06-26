@@ -1,6 +1,8 @@
 package student.searchalg.frontier;
 
 import game.ExplorationState;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 
 import java.util.Map;
 
@@ -13,6 +15,20 @@ public class GradientFrontierUtilitySearch extends BaseFrontierSearch {
     }
 
     public GradientFrontierUtilitySearch(double lambda) {
+        if (lambda <= 0) {
+            throw new IllegalArgumentException(
+                    "lambda must be positive; got " + lambda);
+        }
+
+        this.lambda = lambda;
+    }
+
+    protected GradientFrontierUtilitySearch(
+            double lambda,
+            BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+
+        super(benchmarkWriter);
+
         if (lambda <= 0) {
             throw new IllegalArgumentException(
                     "lambda must be positive; got " + lambda);

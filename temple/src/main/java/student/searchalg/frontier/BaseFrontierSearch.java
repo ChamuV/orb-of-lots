@@ -2,6 +2,8 @@ package student.searchalg.frontier;
 
 import game.ExplorationState;
 import game.NodeStatus;
+import student.benchmark.BenchmarkResult;
+import student.benchmark.writer.BenchmarkWriter;
 import student.searchalg.Algorithm;
 
 import java.util.ArrayList;
@@ -15,6 +17,14 @@ import java.util.Queue;
 import java.util.Set;
 
 public abstract class BaseFrontierSearch extends Algorithm {
+
+    protected BaseFrontierSearch() {
+        super();
+    }
+
+    protected BaseFrontierSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
+        super(benchmarkWriter);
+    }
 
     private final Map<Long, Set<Long>> knownGraph = new HashMap<>();
     private final Map<Long, Integer> distanceToOrb = new HashMap<>();
@@ -193,7 +203,7 @@ public abstract class BaseFrontierSearch extends Algorithm {
     }
 
     protected Set<Long> knownNeighbours(long node) {
-    return Collections.unmodifiableSet(
+        return Collections.unmodifiableSet(
             knownGraph.getOrDefault(node, Collections.emptySet()));
 }
 }
