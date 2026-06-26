@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -122,7 +122,7 @@ public abstract class BaseFrontierSearch extends Algorithm {
 
     protected Map<Long, Integer> bfsDistances(long start) {
         Map<Long, Integer> dist = new HashMap<>();
-        Queue<Long> queue = new LinkedList<>();
+        Queue<Long> queue = new ArrayDeque<>();
 
         dist.put(start, 0);
         queue.add(start);
@@ -147,7 +147,7 @@ public abstract class BaseFrontierSearch extends Algorithm {
             return List.of(start);
         }
 
-        Queue<Long> queue = new LinkedList<>();
+        Queue<Long> queue = new ArrayDeque<>();
         Map<Long, Long> parent = new HashMap<>();
         Set<Long> seen = new HashSet<>();
 

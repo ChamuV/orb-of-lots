@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -61,7 +61,7 @@ public class BreadthFirstSearch extends Algorithm {
     private final Set<Long> bfsExpanded = new HashSet<>();
 
     /** Queue of discovered nodes awaiting BFS expansion. */
-    private final Queue<Long> bfsQueue = new LinkedList<>();
+    private final Queue<Long> bfsQueue = new ArrayDeque<>();
 
     /**
      * Explores the cavern using a breadth-first search strategy.
@@ -161,7 +161,7 @@ public class BreadthFirstSearch extends Algorithm {
             return List.of(start);
         }
 
-        Queue<Long> queue = new LinkedList<>();
+        Queue<Long> queue = new ArrayDeque<>();
         Map<Long, Long> parent = new HashMap<>();
         Set<Long> seen = new HashSet<>();
 
