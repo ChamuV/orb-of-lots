@@ -205,5 +205,5 @@ public abstract class BaseFrontierSearch extends Algorithm {
     protected Set<Long> knownNeighbours(long node) {
         return Collections.unmodifiableSet(
             knownGraph.getOrDefault(node, Collections.emptySet()));
-}
+    }
 }
