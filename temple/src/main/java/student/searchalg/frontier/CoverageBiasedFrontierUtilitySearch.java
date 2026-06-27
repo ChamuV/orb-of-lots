@@ -22,16 +22,20 @@ public class CoverageBiasedFrontierUtilitySearch extends BaseFrontierSearch {
 
     private final double mu;
 
+    private static double requireNonNegativeMu(double mu) {
+        if (mu < 0) {
+            throw new IllegalArgumentException("mu must be non-negative; got " + mu);
+        }
+
+        return mu;
+    }
+
     public CoverageBiasedFrontierUtilitySearch() {
         this(1.5);
     }
 
     public CoverageBiasedFrontierUtilitySearch(double mu) {
-        if (mu < 0) {
-            throw new IllegalArgumentException("mu must be non-negative; got " + mu);
-        }
-
-        this.mu = mu;
+        this.mu = requireNonNegativeMu(mu);
     }
 
     protected CoverageBiasedFrontierUtilitySearch(
@@ -39,13 +43,7 @@ public class CoverageBiasedFrontierUtilitySearch extends BaseFrontierSearch {
             BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
 
         super(benchmarkWriter);
-
-        if (mu < 0) {
-            throw new IllegalArgumentException(
-                    "mu must be non-negative; got " + mu);
-        }
-
-        this.mu = mu;
+        this.mu = requireNonNegativeMu(mu);
     }
 
     @Override
