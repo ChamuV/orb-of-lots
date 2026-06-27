@@ -30,6 +30,16 @@ dependencies {
     // Original coursework template:
     // errorprone("com.google.errorprone:error_prone_core:latest.release")
     errorprone("com.google.errorprone:error_prone_core:2.20.0")
+
+    // JUnit 5 for unit and integration tests.
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+}
+
+// Enable JUnit 5 test discovery.
+tasks.test {
+    useJUnitPlatform()
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
