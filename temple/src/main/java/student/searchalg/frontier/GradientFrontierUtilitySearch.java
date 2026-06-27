@@ -10,17 +10,21 @@ public class GradientFrontierUtilitySearch extends BaseFrontierSearch {
 
     private final double lambda;
 
-    public GradientFrontierUtilitySearch() {
-        this(2.0);
-    }
-
-    public GradientFrontierUtilitySearch(double lambda) {
+    private static double requirePositiveLambda(double lambda) {
         if (lambda <= 0) {
             throw new IllegalArgumentException(
                     "lambda must be positive; got " + lambda);
         }
 
-        this.lambda = lambda;
+        return lambda;
+    }
+
+    public GradientFrontierUtilitySearch() {
+        this(2.0);
+    }
+
+    public GradientFrontierUtilitySearch(double lambda) {
+        this.lambda = requirePositiveLambda(lambda);
     }
 
     protected GradientFrontierUtilitySearch(
@@ -29,12 +33,7 @@ public class GradientFrontierUtilitySearch extends BaseFrontierSearch {
 
         super(benchmarkWriter);
 
-        if (lambda <= 0) {
-            throw new IllegalArgumentException(
-                    "lambda must be positive; got " + lambda);
-        }
-
-        this.lambda = lambda;
+        this.lambda = requirePositiveLambda(lambda);
     }
 
     @Override
@@ -55,6 +54,7 @@ public class GradientFrontierUtilitySearch extends BaseFrontierSearch {
 
     @Override
     protected boolean shouldReplan(ExplorationState state, long currentTarget) {
+        // Always replan so the frontier is re-evaluated after every move.
         return true;
     }
 }
