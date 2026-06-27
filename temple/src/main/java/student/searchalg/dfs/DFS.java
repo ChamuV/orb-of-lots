@@ -9,28 +9,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Standard depth-first search exploration strategy.
+ * Depth-first search with no heuristic ordering.
  *
- * <p>This implementation explores neighbouring nodes in the order provided
- * by the game engine. It performs no additional heuristic ordering, making
- * it a baseline DFS strategy for comparison with more informed variants.</p>
+ * <p>Neighbours are explored in the order provided by the game engine.
+ * Serves as a baseline for comparison with heuristic DFS variants.
  */
 public class DFS extends BaseDFS {
 
+    /** Creates an instance with the default CSV benchmark writer. */
     public DFS() {
         super();
     }
 
+    /**
+     * Creates an instance with the given benchmark writer.
+     *
+     * @param benchmarkWriter writer for benchmark results, or {@code null}
+     *                        for the default CSV writer
+     */
     DFS(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
         super(benchmarkWriter);
     }
 
-    /**
-     * Returns neighbouring nodes in their original order.
-     *
-     * @param state the current exploration state
-     * @return the neighbouring nodes without reordering
-     */
+    /** Returns neighbours in the order provided by the game engine. */
     @Override
     protected List<NodeStatus> orderedNeighbours(ExplorationState state) {
         return new ArrayList<>(state.getNeighbours());

@@ -2,9 +2,9 @@ package student.searchalg.bfs;
 
 import game.ExplorationState;
 import game.NodeStatus;
-import student.searchalg.Algorithm;
 import student.benchmark.BenchmarkResult;
 import student.benchmark.writer.BenchmarkWriter;
+import student.searchalg.Algorithm;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,57 +19,62 @@ import java.util.Set;
 /**
  * Breadth-first search exploration strategy.
  *
- * <p>This implementation builds an internal graph of the explored cavern and
- * expands nodes in breadth-first order. Because movement in the game is
- * physical rather than abstract, the explorer must repeatedly navigate across
- * the known graph to reach the next node selected by the BFS frontier.</p>
+ * <p>Builds an incremental graph of the cavern as the explorer moves and
+ * expands nodes in breadth-first order. Because exploration is physical,
+ * the explorer must navigate across the known graph to reach each BFS
+ * frontier node before expanding it.
  *
- * <p>Two separate sets are maintained to distinguish between nodes that have
- * been physically visited (used to build the graph model) and nodes that have
- * been expanded by the BFS frontier (used to manage search order). Conflating
- * these two concepts causes the algorithm to terminate immediately, since the
- * start node is physically visited before BFS can select it for expansion.</p>
+ * <p>Two separate sets distinguish nodes that have been physically visited
+ * (used to build the graph) from nodes expanded by BFS (used to manage
+ * search order). Conflating them would cause the algorithm to terminate
+ * immediately, since the start node is physically visited before BFS
+ * can select it for expansion.
  *
- * <p>This strategy is included as a baseline for comparison with heuristic
- * and frontier-based exploration algorithms.</p>
+ * <p>Included as a baseline for comparison with heuristic and
+ * frontier-based strategies.
  */
 public class BreadthFirstSearch extends Algorithm {
 
+    /** Creates an instance with the default CSV benchmark writer. */
     public BreadthFirstSearch() {
         super();
     }
 
+    /**
+     * Creates an instance with the given benchmark writer.
+     *
+     * @param benchmarkWriter writer for benchmark results, or {@code null}
+     *                        for the default CSV writer
+     */
     BreadthFirstSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
         super(benchmarkWriter);
     }
 
-    /** Adjacency list representing the explored portion of the cavern. */
+    /** Adjacency list of the explored portion of the cavern. */
     private final Map<Long, Set<Long>> knownGraph = new HashMap<>();
 
     /**
-     * Nodes physically visited by the explorer.
-     * Used to build and update the graph model on arrival.
+     * Nodes physically visited by the explorer, used to build the graph model.
+     * Kept separate from {@link #bfsExpanded} to avoid premature termination.
      */
     private final Set<Long> physicallyVisited = new HashSet<>();
 
     /**
-     * Nodes already expanded by the BFS frontier.
-     * A node is expanded when it is popped from the BFS queue and its
-     * neighbours are enqueued. Kept separate from physicallyVisited to
-     * avoid premature termination of the search.
+     * Nodes already expanded by BFS. A node is expanded when popped from the
+     * queue and its neighbours enqueued. Kept separate from
+     * {@link #physicallyVisited} to avoid premature termination.
      */
     private final Set<Long> bfsExpanded = new HashSet<>();
 
-    /** Queue of discovered nodes awaiting BFS expansion. */
+    /** Nodes discovered but not yet BFS-expanded. */
     private final Queue<Long> bfsQueue = new ArrayDeque<>();
 
     /**
-     * Explores the cavern using a breadth-first search strategy.
+     * Explores the cavern using breadth-first search.
      *
-     * <p>The algorithm expands nodes in order of increasing graph distance
-     * from the starting location. When the next frontier node is selected,
-     * the explorer physically travels to that node using the shortest known
-     * path before continuing the search.</p>
+     * <p>Nodes are expanded in order of increasing graph distance from the
+     * start. For each selected node, the explorer physically navigates to it
+     * along the shortest known path before expanding its neighbours.
      *
      * @param state the current exploration state
      */
@@ -81,7 +86,6 @@ public class BreadthFirstSearch extends Algorithm {
         while (state.getDistanceToTarget() != 0) {
             Long target = null;
 
-            // Find the next queued node that has not already been BFS-expanded.
             while (!bfsQueue.isEmpty()) {
                 long candidate = bfsQueue.peek();
 
@@ -125,12 +129,10 @@ public class BreadthFirstSearch extends Algorithm {
     }
 
     /**
-     * Updates the internal graph with information visible from the current node.
+     * Updates the internal graph from the current position.
      *
-     * <p>Newly discovered nodes and connections are added to the explored graph,
-     * allowing future navigation and breadth-first expansion. Records the node
-     * as physically visited but does not mark it as BFS-expanded — that happens
-     * only when BFS selects it from the frontier queue.</p>
+     * <p>Marks the node as physically visited and records all visible
+     * neighbour edges. Does not mark the node as BFS-expanded.
      *
      * @param state the current exploration state
      */
@@ -149,12 +151,11 @@ public class BreadthFirstSearch extends Algorithm {
     }
 
     /**
-     * Computes the shortest known path between two explored nodes.
+     * Returns the shortest known path from {@code start} to {@code target}.
      *
-     * @param start  the starting node ID
+     * @param start  the source node ID
      * @param target the destination node ID
-     * @return the shortest known path from {@code start} to {@code target},
-     *         or an empty list if no path is currently known
+     * @return ordered list of node IDs, or an empty list if no path is known
      */
     private List<Long> shortestPath(long start, long target) {
         if (start == target) {
@@ -190,14 +191,6 @@ public class BreadthFirstSearch extends Algorithm {
         return Collections.emptyList();
     }
 
-    /**
-     * Reconstructs a path from the parent map produced by the graph search.
-     *
-     * @param parent parent relationship recorded during the search
-     * @param start  the starting node ID
-     * @param target the destination node ID
-     * @return the reconstructed path from {@code start} to {@code target}
-     */
     private List<Long> reconstructPath(Map<Long, Long> parent, long start, long target) {
         List<Long> path = new ArrayList<>();
         long current = target;

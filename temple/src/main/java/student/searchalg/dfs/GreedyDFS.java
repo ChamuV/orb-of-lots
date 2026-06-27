@@ -9,28 +9,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Depth-first search strategy that prioritises nodes closer to the Orb.
+ * Depth-first search that prioritises neighbours closer to the Orb.
  *
- * <p>Neighbouring nodes are ordered using the game's distance-to-target
- * heuristic before exploration. This typically guides the search towards
- * the Orb more quickly than standard DFS while retaining the same
- * depth-first traversal behaviour.</p>
+ * <p>Neighbours are sorted by the game's distance-to-target estimate before
+ * exploration, guiding the search toward the Orb faster than unordered DFS
+ * while retaining the same backtracking behaviour.
  */
 public class GreedyDFS extends BaseDFS {
 
+    /** Creates an instance with the default CSV benchmark writer. */
     public GreedyDFS() {
         super();
     }
 
+    /**
+     * Creates an instance with the given benchmark writer.
+     *
+     * @param benchmarkWriter writer for benchmark results, or {@code null}
+     *                        for the default CSV writer
+     */
     GreedyDFS(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
         super(benchmarkWriter);
     }
 
     /**
-     * Returns neighbouring nodes ordered by their estimated distance to the Orb.
+     * Returns neighbours sorted by ascending distance-to-target estimate.
      *
      * @param state the current exploration state
-     * @return neighbouring nodes ordered from closest to furthest
+     * @return neighbours ordered from closest to furthest from the Orb
      */
     @Override
     protected List<NodeStatus> orderedNeighbours(ExplorationState state) {

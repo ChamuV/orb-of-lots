@@ -12,44 +12,50 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Depth-first exploration strategy with an adaptive distance heuristic.
+ * Depth-first search with an online-updated distance heuristic.
  *
- * <p>This strategy begins with the distance-to-orb estimates provided by the
- * game engine, then updates remembered heuristic values as the search
- * progresses. Nodes that lead towards less promising regions become less
- * attractive in later decisions.</p>
+ * <p>Initialises heuristic estimates from the game's distance-to-target
+ * values, then raises them as exploration reveals that certain nodes lead
+ * to less promising regions. This is a form of real-time heuristic search
+ * applied within a DFS framework: nodes whose heuristic has been raised
+ * by backtracking experience are deprioritised in later decisions.
  */
 public class AdaptiveHeuristicSearch extends BaseDFS {
 
-    /** Learned heuristic estimates indexed by node ID. */
+    /** Learned heuristic estimates, updated as the search progresses. */
     private final Map<Long, Integer> learnedHeuristic = new HashMap<>();
 
+    /** Creates an instance with the default CSV benchmark writer. */
     public AdaptiveHeuristicSearch() {
         super();
     }
 
+    /**
+     * Creates an instance with the given benchmark writer.
+     *
+     * @param benchmarkWriter writer for benchmark results, or {@code null}
+     *                        for the default CSV writer
+     */
     AdaptiveHeuristicSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
         super(benchmarkWriter);
     }
 
     /**
-     * Returns neighbouring nodes ordered by their learned heuristic estimate.
+     * Returns neighbours sorted by their current learned heuristic estimate.
      *
-     * <p>Before sorting, the current node and its neighbours are added to the
-     * heuristic table if they have not been seen before. The current node's
-     * estimate is then updated using the best known neighbouring estimate.</p>
+     * <p>Seeds any unseen nodes into the heuristic table, updates the current
+     * node's estimate based on its best neighbour, then sorts neighbours by
+     * ascending learned estimate.
      *
      * @param state the current exploration state
-     * @return neighbouring nodes ordered from most to least promising
+     * @return neighbours ordered from most to least promising
      */
     @Override
     protected List<NodeStatus> orderedNeighbours(ExplorationState state) {
         long currentLocation = state.getCurrentLocation();
-
         learnedHeuristic.putIfAbsent(currentLocation, state.getDistanceToTarget());
 
         List<NodeStatus> neighbours = new ArrayList<>(state.getNeighbours());
-
         for (NodeStatus neighbour : neighbours) {
             learnedHeuristic.putIfAbsent(
                     neighbour.nodeID(),
@@ -72,30 +78,30 @@ public class AdaptiveHeuristicSearch extends BaseDFS {
     }
 
     /**
-     * Updates the learned heuristic estimate for the current node.
+     * Raises the learned heuristic for the current node if a better estimate
+     * is available from its neighbours.
      *
-     * <p>The update is based on the best neighbouring estimate plus the cost
-     * of moving to that neighbour. The stored value only increases, so nodes
-     * that appear less useful after exploration are deprioritised later.</p>
+     * <p>The new estimate is {@code min(neighbourEstimate) + 1}. The stored
+     * value only ever increases, so backtracking experience permanently
+     * reduces a node's priority.
      *
-     * @param currentLocation the ID of the current node
-     * @param neighbours the neighbouring nodes visible from the current node
+     * @param currentLocation the current node ID
+     * @param neighbours      visible neighbours from the current node
      */
     private void updateCurrentHeuristic(long currentLocation, List<NodeStatus> neighbours) {
         int bestNeighbourEstimate = Integer.MAX_VALUE;
 
         for (NodeStatus neighbour : neighbours) {
-            int neighbourEstimate = learnedHeuristic.getOrDefault(
+            int estimate = learnedHeuristic.getOrDefault(
                     neighbour.nodeID(),
                     neighbour.distanceToTarget()
             );
-
-            bestNeighbourEstimate = Math.min(bestNeighbourEstimate, 1 + neighbourEstimate);
+            bestNeighbourEstimate = Math.min(bestNeighbourEstimate, 1 + estimate);
         }
 
         if (bestNeighbourEstimate != Integer.MAX_VALUE) {
-            int oldEstimate = learnedHeuristic.getOrDefault(currentLocation, bestNeighbourEstimate);
-            learnedHeuristic.put(currentLocation, Math.max(oldEstimate, bestNeighbourEstimate));
+            int old = learnedHeuristic.getOrDefault(currentLocation, bestNeighbourEstimate);
+            learnedHeuristic.put(currentLocation, Math.max(old, bestNeighbourEstimate));
         }
     }
 }

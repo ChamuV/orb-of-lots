@@ -2,9 +2,9 @@ package student.searchalg.rta;
 
 import game.ExplorationState;
 import game.NodeStatus;
-import student.searchalg.Algorithm;
 import student.benchmark.BenchmarkResult;
 import student.benchmark.writer.BenchmarkWriter;
+import student.searchalg.Algorithm;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,35 +13,40 @@ import java.util.Map;
 /**
  * Real-Time A* exploration strategy.
  *
- * <p>This strategy performs online heuristic search using only the currently
- * visible neighbouring nodes. At each step, the explorer updates the heuristic
- * estimate for its current location, then moves to the neighbour with the
- * lowest estimated one-step cost.</p>
+ * <p>At each step, selects the neighbour with the lowest one-step cost
+ * estimate {@code f = 1 + h(neighbour)}, then raises the current node's
+ * heuristic to that value if it is higher. This upward update discourages
+ * revisiting nodes that have proven less promising than they appeared.
  *
- * <p>The heuristic table is initialised using the game's distance-to-target
- * estimates and is updated upward as the explorer learns that certain nodes
- * are less promising than they first appeared.</p>
+ * <p>Heuristic values are seeded from the game's distance-to-target
+ * estimates on first observation and only ever increase thereafter.
  */
 public class RealTimeAStarSearch extends Algorithm {
 
+    /** Creates an instance with the default CSV benchmark writer. */
     public RealTimeAStarSearch() {
         super();
     }
 
+    /**
+     * Creates an instance with the given benchmark writer.
+     *
+     * @param benchmarkWriter writer for benchmark results, or {@code null}
+     *                        for the default CSV writer
+     */
     RealTimeAStarSearch(BenchmarkWriter<BenchmarkResult> benchmarkWriter) {
         super(benchmarkWriter);
     }
 
-    /** Learned heuristic estimates indexed by node ID. */
+    /** Learned heuristic estimates, seeded from game distances and updated upward. */
     private final Map<Long, Integer> heuristic = new HashMap<>();
 
     /**
      * Explores the cavern using real-time A* search.
      *
-     * <p>For each visible neighbour, the algorithm computes the one-step
-     * estimate {@code f = 1 + h}. The current node's heuristic value is then
-     * raised to the best such estimate, and the explorer moves immediately to
-     * the neighbour with the lowest value.</p>
+     * <p>Each iteration seeds heuristics for visible neighbours, selects the
+     * neighbour with the lowest {@code f = 1 + h} value, raises the current
+     * node's heuristic if the best {@code f} exceeds it, then moves.
      *
      * @param state the current exploration state
      */
@@ -70,33 +75,24 @@ public class RealTimeAStarSearch extends Algorithm {
             if (best == null) {
                 return;
             }
-            
+
             if (bestF > heuristic.getOrDefault(current, 0)) {
                 heuristic.put(current, bestF);
             }
-            
+
             state.moveTo(best.nodeID());
             recordMove();
         }
     }
 
-    /**
-     * Adds initial heuristic estimates for visible neighbours.
-     *
-     * @param neighbours neighbouring nodes visible from the current position
-     */
+    /** Seeds initial heuristic estimates for all visible neighbours. */
     private void seedHeuristics(Collection<NodeStatus> neighbours) {
         for (NodeStatus neighbour : neighbours) {
             seedHeuristic(neighbour.nodeID(), neighbour.distanceToTarget());
         }
     }
 
-    /**
-     * Adds an initial heuristic estimate for a node if it has not been seen before.
-     *
-     * @param nodeId the node ID to initialise
-     * @param gameDistance the distance-to-target estimate provided by the game
-     */
+    /** Records {@code gameDistance} as the heuristic for {@code nodeId} if not yet seen. */
     private void seedHeuristic(long nodeId, int gameDistance) {
         heuristic.putIfAbsent(nodeId, gameDistance);
     }
