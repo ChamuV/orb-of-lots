@@ -1,5 +1,7 @@
 package student.benchmark.analysis;
 
+import com.google.common.base.Splitter;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -94,20 +96,20 @@ public class BenchmarkLoader {
     }
 
     private BenchmarkRun parseRun(String line) {
-        String[] parts = line.split(",");
+        List<String> parts = Splitter.on(',').splitToList(line);
 
-        if (parts.length != 5) {
+        if (parts.size() != 5) {
             throw new IllegalArgumentException(
                     "Invalid benchmark row: " + line
             );
         }
 
         return new BenchmarkRun(
-                parts[0],
-                Long.parseLong(parts[1]),
-                Boolean.parseBoolean(parts[2]),
-                Integer.parseInt(parts[3]),
-                Long.parseLong(parts[4])
+                parts.get(0),
+                Long.parseLong(parts.get(1)),
+                Boolean.parseBoolean(parts.get(2)),
+                Integer.parseInt(parts.get(3)),
+                Long.parseLong(parts.get(4))
         );
     }
 }
