@@ -7,6 +7,7 @@ import student.benchmark.writer.BenchmarkWriter;
 import student.searchalg.Algorithm;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -103,10 +104,7 @@ public class IterativeDeepeningAStarSearch extends Algorithm {
         visited.add(current);
 
         List<NodeStatus> neighbours = new ArrayList<>(state.getNeighbours());
-        neighbours.sort((a, b) -> Integer.compare(
-                (g + 1) + a.distanceToTarget(),
-                (g + 1) + b.distanceToTarget()
-        ));
+        neighbours.sort(Comparator.comparingInt(NodeStatus::distanceToTarget));
 
         int minPruned = Integer.MAX_VALUE;
 
