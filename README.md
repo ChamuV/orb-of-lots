@@ -1,16 +1,18 @@
 # Orb of Lots
 
-An autonomous search agent for the **Orb of Lots** Software Design & Programming coursework.
+### Designing an Online Graph Search Algorithm for Unknown Environment Exploration
+
+> Exploring how classical search principles can be adapted to unknown environments.
 
 ---
 
-## Overview
+## Project Overview
 
-This project implements an autonomous agent that locates a hidden Orb inside an initially unknown cavern graph. The agent cannot see the full map — it discovers the graph incrementally, deciding at each step where to move using only its current location, visible neighbours, and a heuristic distance estimate to the Orb.
+The Orb of Lots is an online graph exploration problem in which an autonomous agent must locate a hidden Orb within an initially unknown cavern before successfully escaping. Although the complete challenge consists of both an exploration phase and an escape phase, this project focuses exclusively on the exploration phase, where the objective is to locate the Orb as efficiently as possible while gradually discovering the structure of the environment.
 
-The core challenge is an **online graph search problem**: unlike classical search, there is no complete graph to reason over upfront. Every algorithm must be evaluated on how efficiently it explores an unknown space, not just how well it routes through a known one.
+During exploration, the agent has access only to information available from its current position. At each step, it knows its current location, the neighbouring nodes that can be reached next, and the straight-line distance to the Orb. The remainder of the graph is revealed only through physical exploration, meaning every movement decision must be made using incomplete information. This places the problem within the domain of online graph search, where planning and exploration occur simultaneously.
 
-After investigating several algorithm families — baselines, heuristic online search, and frontier utility search — a novel algorithm was developed within the frontier family and selected as the final strategy based on empirical benchmarking.
+The aim of this project was to investigate how principles from classical graph search can be adapted to this online setting. Multiple search strategies were implemented, benchmarked, and evaluated to understand which ideas remain effective when the search graph is initially unknown. The findings from this investigation ultimately led to the development of Coverage-Biased Frontier Utility Search, a new frontier-based exploration algorithm that extends frontier search by introducing a lightweight coverage heuristic to bias exploration towards frontier regions expected to maximise the amount of newly discovered environment.
 
 ---
 
