@@ -6,11 +6,11 @@ import student.benchmark.BenchmarkResult;
 import student.benchmark.writer.BenchmarkWriter;
 import student.searchalg.Algorithm;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -116,6 +116,17 @@ public abstract class BaseFrontierSearch extends Algorithm {
             Map<Long, Integer> travelCost,
             Map<Long, Integer> distToOrb);
 
+    protected double baseScore(
+            long candidate,
+            Map<Long, Integer> travelCost,
+            Map<Long, Integer> distToOrb) {
+
+        int orb = distToOrb.getOrDefault(candidate, Integer.MAX_VALUE / 2);
+        int travel = travelCost.getOrDefault(candidate, Integer.MAX_VALUE / 2);
+
+        return orb + travel;
+    }
+
     protected boolean shouldReplan(ExplorationState state, long currentTarget) {
         return false;
     }
@@ -204,6 +215,6 @@ public abstract class BaseFrontierSearch extends Algorithm {
 
     protected Set<Long> knownNeighbours(long node) {
         return Collections.unmodifiableSet(
-            knownGraph.getOrDefault(node, Collections.emptySet()));
+                knownGraph.getOrDefault(node, Collections.emptySet()));
     }
 }
