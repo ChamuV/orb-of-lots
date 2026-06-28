@@ -60,6 +60,13 @@ public final class BulkBenchmarkRunner {
         // Utility class
     }
 
+    /**
+     * Runs all configured algorithms over the fixed seed list and writes
+     * per-run CSV results to the benchmark data directory.
+     *
+     * @param args unused
+     * @throws IOException if the seeds file cannot be read
+     */
     public static void main(String[] args) throws IOException {
         List<Long> seeds = readSeeds();
 

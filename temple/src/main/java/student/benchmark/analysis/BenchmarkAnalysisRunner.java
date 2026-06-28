@@ -7,6 +7,12 @@ import java.util.List;
  */
 public class BenchmarkAnalysisRunner {
 
+    /**
+     * Loads all benchmark runs from CSV files, computes per-algorithm
+     * statistics and per-seed win counts, then prints both to standard output.
+     *
+     * @param args unused
+     */
     public static void main(String[] args) {
         BenchmarkLoader loader = new BenchmarkLoader();
         BenchmarkAnalyzer analyzer = new BenchmarkAnalyzer();

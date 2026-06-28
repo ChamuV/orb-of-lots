@@ -11,6 +11,13 @@ import java.util.stream.Collectors;
  */
 public class BenchmarkAnalyzer {
 
+    /**
+     * Produces one {@link BenchmarkStatistics} record per algorithm found in
+     * {@code runs}, sorted by mean move count ascending.
+     *
+     * @param runs all loaded benchmark runs
+     * @return per-algorithm statistics, sorted from fewest to most mean moves
+     */
     public List<BenchmarkStatistics> analyze(List<BenchmarkRun> runs) {
         Map<String, List<BenchmarkRun>> runsByAlgorithm =
                 runs.stream()

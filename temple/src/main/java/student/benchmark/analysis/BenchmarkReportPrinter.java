@@ -7,6 +7,11 @@ import java.util.List;
  */
 public class BenchmarkReportPrinter {
 
+    /**
+     * Prints a summary table of per-algorithm statistics to standard output.
+     *
+     * @param statistics per-algorithm statistics, typically sorted by mean move count
+     */
     public void printSummary(List<BenchmarkStatistics> statistics) {
         System.out.println("Benchmark Summary");
         System.out.println("=================");
@@ -51,6 +56,11 @@ public class BenchmarkReportPrinter {
         System.out.println();
     }
 
+    /**
+     * Prints a table of per-seed win counts to standard output.
+     *
+     * @param winCounts win counts, typically sorted from most wins to fewest
+     */
     public void printWinCounts(List<AlgorithmWinCount> winCounts) {
         System.out.println("Win Counts");
         System.out.println("==========");

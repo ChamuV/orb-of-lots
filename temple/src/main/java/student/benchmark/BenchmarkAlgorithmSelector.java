@@ -15,20 +15,39 @@ import student.searchalg.rta.RealTimeAStarSearch;
 /**
  * Selects an exploration algorithm during bulk benchmark runs.
  *
- * <p>Normal GUI/TXT runs are unaffected: if no benchmark algorithm property is
- * set, Explorer uses its normal final algorithm.
+ * <p>Reads the JVM system property {@link #ALGORITHM_PROPERTY} to determine
+ * which algorithm to instantiate. Parameterised algorithms encode their
+ * parameter after a colon, e.g. {@code CoverageBiasedFrontierUtilitySearch:1.5}.
+ *
+ * <p>Normal GUI and TXT runs are unaffected: if the property is absent,
+ * {@link #selectOrDefault} returns the caller's default algorithm unchanged.
  */
 public final class BenchmarkAlgorithmSelector {
 
-    public static final String BENCHMARK_NAME_PROPERTY =
-        "benchmark.name";
-        
+    /**
+     * JVM property key carrying the display name for the current benchmark run.
+     * Used by the writer to derive the output CSV filename.
+     */
+    public static final String BENCHMARK_NAME_PROPERTY = "benchmark.name";
+
+    /**
+     * JVM property key carrying the algorithm identifier for the current run.
+     * Format: {@code AlgorithmName} or {@code AlgorithmName:parameter}.
+     */
     public static final String ALGORITHM_PROPERTY = "benchmark.algorithm";
 
     private BenchmarkAlgorithmSelector() {
         // Utility class
     }
 
+    /**
+     * Returns the algorithm identified by {@link #ALGORITHM_PROPERTY}, or
+     * {@code defaultAlgorithm} if the property is absent or blank.
+     *
+     * @param defaultAlgorithm algorithm to use when no benchmark property is set
+     * @return the selected or default algorithm
+     * @throws IllegalArgumentException if the property value names an unknown algorithm
+     */
     public static SearchAlgorithm selectOrDefault(SearchAlgorithm defaultAlgorithm) {
         String algorithmName = System.getProperty(ALGORITHM_PROPERTY);
 

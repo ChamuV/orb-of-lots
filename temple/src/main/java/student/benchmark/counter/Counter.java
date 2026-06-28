@@ -5,7 +5,13 @@ package student.benchmark.counter;
  */
 public interface Counter {
 
+    /** Increments the count by one. */
     void increment();
 
+    /**
+     * Returns the current count.
+     *
+     * @return the current count value
+     */
     int getValue();
 }

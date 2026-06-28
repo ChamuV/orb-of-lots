@@ -17,6 +17,11 @@ public class BenchmarkResult {
     private long seed;
     private boolean success = true;
 
+    /**
+     * Creates a result for the named algorithm with default field values.
+     *
+     * @param algorithmName name of the algorithm being benchmarked
+     */
     public BenchmarkResult(String algorithmName) {
         this.algorithmName = algorithmName;
     }

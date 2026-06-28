@@ -12,6 +12,11 @@ public class FileCsvWriter implements CsvWriter {
 
     private final Path outputPath;
 
+    /**
+     * Creates a writer that appends to the given file path.
+     *
+     * @param outputPath path to the CSV output file
+     */
     public FileCsvWriter(Path outputPath) {
         this.outputPath = outputPath;
     }

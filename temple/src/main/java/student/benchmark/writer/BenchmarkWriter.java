@@ -7,6 +7,11 @@ package student.benchmark.writer;
  */
 public interface BenchmarkWriter<T> {
 
+    /**
+     * Writes the given benchmark data to the output destination.
+     *
+     * @param data the benchmark data to write
+     */
     void write(T data);
 
 }
