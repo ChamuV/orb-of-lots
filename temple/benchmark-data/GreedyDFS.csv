@@ -1,0 +1,5 @@
+algorithm,seed,success,moves,runtime_us
+GreedyDFS,0,true,22,10663245
+GreedyDFS,0,true,36,17344405
+GreedyDFS,0,true,36,17426871
+GreedyDFS,0,true,36,17317559

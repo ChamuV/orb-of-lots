@@ -1,0 +1,6 @@
+algorithm,seed,success,moves,runtime_us
+DFS,0,true,91,6566196
+DFS,0,true,38,3079215
+DFS,0,true,38,18341299
+DFS,0,true,44,21221108
+DFS,0,true,44,21150689
