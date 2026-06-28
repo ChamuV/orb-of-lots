@@ -1,7 +1,6 @@
 package student.benchmark;
 
 import student.searchalg.SearchAlgorithm;
-import student.searchalg.bfs.BreadthFirstSearch;
 import student.searchalg.dfs.AdaptiveHeuristicSearch;
 import student.searchalg.dfs.DFS;
 import student.searchalg.dfs.GreedyDFS;
@@ -55,7 +54,6 @@ public final class BenchmarkAlgorithmSelector {
             case "DFS" -> new DFS();
             case "GreedyDFS" -> new GreedyDFS();
             case "AdaptiveHeuristicSearch" -> new AdaptiveHeuristicSearch();
-            case "BreadthFirstSearch" -> new BreadthFirstSearch();
             case "RandomWalkSearch" -> new RandomWalkSearch();
             case "RealTimeAStarSearch" -> new RealTimeAStarSearch();
             case "IterativeDeepeningAStarSearch" -> new IterativeDeepeningAStarSearch();

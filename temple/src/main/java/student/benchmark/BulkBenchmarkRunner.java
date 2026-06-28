@@ -24,7 +24,6 @@ public final class BulkBenchmarkRunner {
         "DFS",
         "GreedyDFS",
         "AdaptiveHeuristicSearch",
-        "BreadthFirstSearch",
         "RandomWalkSearch",
         "RealTimeAStarSearch",
         "IterativeDeepeningAStarSearch",
