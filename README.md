@@ -1,4 +1,4 @@
-# Orb of Lots
+# Orb of Lots — Online Graph Search Investigation
 
 ### Designing an Online Graph Search Algorithm for Unknown Environment Exploration
 
@@ -12,13 +12,24 @@ The Orb of Lots is an online graph exploration problem in which an autonomous ag
 
 During exploration, the agent has access only to information available from its current position. At each step, it knows its current location, the neighbouring nodes that can be reached next, and the straight-line distance to the Orb. The remainder of the graph is revealed only through physical exploration, meaning every movement decision must be made using incomplete information. This places the problem within the domain of online graph search, where planning and exploration occur simultaneously.
 
-The aim of this project was to investigate how principles from classical graph search can be adapted to this online setting. Multiple search strategies were implemented, benchmarked, and evaluated to understand which ideas remain effective when the search graph is initially unknown. The investigation ultimately led to the design of Coverage-Biased Frontier Utility Search, a new frontier-based exploration algorithm that extends frontier search by introducing a lightweight coverage heuristic to bias exploration towards frontier regions expected to maximise the amount of newly discovered environment.
+The aim of this project was to investigate how principles from classical graph search can be adapted to this online setting. Multiple search strategies were implemented, benchmarked, and evaluated to understand which ideas remain effective when the search graph is initially unknown. The investigation ultimately led to the design of Coverage-Biased Frontier Utility Search, a frontier-based exploration algorithm proposed in this project that extends frontier search by introducing a lightweight coverage heuristic to bias exploration towards frontier regions expected to maximise the amount of newly discovered environment.
 
 ---
 
 [GIF!]
 
 ---
+
+## Key Features
+
+- Multiple online graph search algorithms
+- Coverage-Biased Frontier Utility Search
+- Bulk benchmarking framework with reproducible fixed-seed experiments
+- Statistical benchmark analysis tools
+- Comprehensive Javadocs and documentation
+- Unit tests for core components
+
+--- 
 
 ## Motivation
 
@@ -64,7 +75,7 @@ $$
 
 where $c(n)$ represents a lightweight estimate of the expected amount of previously unseen environment revealed by exploring a frontier, and $\lambda$ is a tunable parameter controlling the influence of this additional exploration term.
 
-The resulting algorithm, **Coverage-Biased Frontier Utility Search**, extends frontier-based exploration by favouring frontier regions expected to maximise the amount of newly discovered environment while preserving the original frontier utility formulation.
+The resulting algorithm, **Coverage-Biased Frontier Utility Search**, extends frontier-based exploration by favouring frontier regions expected to maximise the amount of newly discovered environment while preserving the original frontier utility formulation. Rather than estimating true information gain, the coverage heuristic uses frontier density as a lightweight proxy for the amount of unexplored environment likely to be revealed, allowing the strategy to remain computationally inexpensive while encouraging exploration of promising regions.
 
 The complete design rationale, implementation details and experimental evaluation are discussed in the accompanying **Algorithm Design** and **Benchmarking documentation**.
 
@@ -85,9 +96,8 @@ The complete design rationale, implementation details and experimental evaluatio
 ├── docs/
 │   ├── algorithm-design.md         # Evolution of the final exploration algorithm
 │   ├── benchmarking.md             # Experimental methodology and performance evaluation
-│   ├── architecture.md             # Software architecture and design decisions
-│   ├── development.md              # Engineering decisions and project evolution
-│   └── testing.md                  # Testing strategy and validation
+│   ├── testing.md                  # Testing strategy and validation
+│   └── architecture.md             # Software architecture and design decisions
 │
 ├── benchmark-data/                 # Benchmark CSV output and experimental data
 ├── README.md                       
@@ -119,11 +129,11 @@ The complete design rationale, implementation details and experimental evaluatio
 ./gradlew :temple:run -PchooseMain=main.TXTmain
 ```
 
-### Run the benchmark suite (optional)
+### Run the benchmark suite (generate and analyse results)
 ```bash
-./gradlew :temple:run -PchooseMain=main.BulkBenchmarkMain
+./gradlew :temple:run -PchooseMain=student.benchmark.BulkBenchmarkRunner && ./gradlew :temple:run -PchooseMain=student.benchmark.analysis.BenchmarkAnalysisRunner
 ```
-Benchmark results are written to the `benchmark-data/` directory as CSV files.
+This command executes the complete benchmark suite, writes the results to `benchmark-data/` as CSV files, and then generates the statistical summary used throughout the benchmarking documentation.
 
 
 ---
@@ -136,9 +146,8 @@ The repository is accompanied by detailed documentation describing the algorithm
 |----------|-------------|
 | `docs/algorithm-design.md` | Evolution of the search algorithms and the development of Coverage-Biased Frontier Utility Search. |
 | `docs/benchmarking.md` | Benchmark methodology, evaluation metrics and comparative performance analysis. |
-| `docs/architecture.md` | Software architecture, design patterns and engineering decisions. |
-| `docs/development.md` | Project evolution, implementation challenges and future improvements. |
 | `docs/testing.md` | Unit testing strategy, benchmark validation and code coverage. |
+| `docs/architecture.md` | Software architecture, design patterns and engineering decisions. |
 
 ---
 

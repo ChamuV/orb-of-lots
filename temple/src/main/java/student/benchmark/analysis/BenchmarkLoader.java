@@ -18,7 +18,7 @@ import java.util.List;
 public class BenchmarkLoader {
 
     private static final Path DEFAULT_BENCHMARK_DIR =
-            Path.of("benchmark-data");
+            Path.of("../benchmark-data");
 
     private final Path benchmarkDir;
 
