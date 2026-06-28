@@ -135,7 +135,7 @@ This motivated Replanning Frontier Search, in which the frontier selection proce
 
 ### 3.3 Gradient Frontier Utility Search
 
-Even with the increased responsiveness introduced by Replanning Frontier Search, a further question remained: when should exploration outweigh direct progress towards the Orb? Since every movement carries a cost, the agent must decide whether travelling to a frontier is justified by the progress it is expected to make towards the Orb.
+Even with the increased responsiveness introduced by Replanning Frontier Search, a limitation remained in how frontier candidates were ranked. The evaluation function treated all frontier nodes at equal orb distance as equally attractive, without considering whether one offered a steeper descent towards the Orb than another. In environments where several frontier nodes were similarly reachable, this meant the algorithm could commit to a frontier that made little progress towards the goal when a better-directed alternative was available. This motivated a variant that explicitly rewards frontier candidates offering the greatest reduction in estimated orb distance.
 
 One variant considered during the investigation was Gradient Frontier Utility Search, a modified frontier algorithm that biases frontier selection towards candidates producing the greatest reduction in the estimated distance to the Orb. This can be viewed as redefining the frontier utility term as
 
@@ -147,7 +147,7 @@ $$
 
 which is substituted into the frontier evaluation function introduced previously.
 
-where v is the current node, n is the frontier candidate, h(v) and h(n) denote the estimated Orb distances from the current node and candidate frontier respectively, and \lambda>0 is a tunable parameter controlling how strongly the search rewards movement down the Orb-distance gradient. This modified utility is then incorporated into the frontier evaluation function, thereby assigning higher priority to frontiers that offer a large reduction in estimated Orb distance.
+where $v$ is the current node, $n$ is the frontier candidate, $h(v)$ and $h(n)$ denote the estimated Orb distances from the current node and candidate frontier respectively, and $\lambda>0$ is a tunable parameter controlling how strongly the search rewards movement down the Orb-distance gradient. This modified utility is then incorporated into the frontier evaluation function, thereby assigning higher priority to frontiers that offer a large reduction in estimated Orb distance.
 
 ### 3.4 Coverage-Biased Frontier Utility Search
 
@@ -159,7 +159,7 @@ $$
 
 where $c(n)$ is a lightweight estimate of the expected coverage associated with a frontier and $\lambda$ is a tunable parameter controlling the influence of this additional term.
 
-Both the Gradient and Coverage variants produced competitive benchmark results over a range of values of $\lambda$. However, the coverage-based formulation consistently achieved the strongest overall performance, with the best results obtained for $\lambda=2$. Beyond its empirical performance, the coverage heuristic was ultimately preferred because it measures the quantity most closely aligned with the objective of efficient online graph exploration. Rather than indirectly encouraging exploration through progress towards the Orb, it directly estimates the expected amount of new information gained by exploring a frontier, thereby enabling more informed frontier selection throughout the exploration process.
+Both the Gradient and Coverage variants produced competitive benchmark results over a range of values of $\lambda$. However, the coverage-based formulation consistently achieved the strongest overall performance, with the best results obtained for $\lambda=1.5$. Beyond its empirical performance, the coverage heuristic was ultimately preferred because it measures the quantity most closely aligned with the objective of efficient online graph exploration. Rather than indirectly encouraging exploration through progress towards the Orb, it directly estimates the expected amount of new information gained by exploring a frontier, thereby enabling more informed frontier selection throughout the exploration process.
 
 ## Summary
 

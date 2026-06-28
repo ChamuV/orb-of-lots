@@ -148,7 +148,7 @@ Centralising benchmark collection within a dedicated class ensures that every al
 
 Rather than writing benchmark results directly to disk, the framework separates result generation from result storage through the `BenchmarkWriter` interface. This follows the Dependency Inversion Principle by allowing algorithms to depend on an abstraction rather than a specific output format.
 
-The default implementation, `CsvRunWriter`, records each `BenchmarkResult` as a CSV file within the benchmark data directory. However, because the output mechanism is abstracted behind a common interface, alternative writers can easily be introduced without modifying the benchmarking framework. This also simplifies testing, where a mock writer can be substituted to verify benchmark behaviour without creating output files.
+The default implementation, `CsvRunWriter`, records each `BenchmarkResult` as a CSV file within the benchmark data directory. However, because the output mechanism is abstracted behind a common interface, alternative writers can easily be introduced without modifying the benchmarking framework. This also simplifies testing, where an alternative writer can be substituted to verify benchmark behaviour in isolation from the file system.
 
 ```text
                  BenchmarkResult
@@ -225,7 +225,6 @@ test/
 ├── searchalg/
 │     ├── dfs/
 │     ├── frontier/
-│     ├── bfs/
 │     ├── random/
 │     ├── rta/
 │     ├── idastar/
