@@ -111,6 +111,7 @@ The complete design rationale, implementation details and experimental evaluatio
 │   │   └── test/java/              # Unit and integration tests
 │
 ├── docs/
+│   ├── assets/                     # GIF demonstrations
 │   ├── algorithm-design.md         # Evolution of the final exploration algorithm
 │   ├── benchmarking.md             # Experimental methodology and performance evaluation
 │   ├── testing.md                  # Testing strategy and validation
@@ -148,7 +149,8 @@ The complete design rationale, implementation details and experimental evaluatio
 
 ### Run the benchmark suite (generate and analyse results)
 ```bash
-./gradlew :temple:run -PchooseMain=student.benchmark.BulkBenchmarkRunner && ./gradlew :temple:run -PchooseMain=student.benchmark.analysis.BenchmarkAnalysisRunner
+./gradlew :temple:run -PchooseMain=student.benchmark.BulkBenchmarkRunner
+./gradlew :temple:run -PchooseMain=student.benchmark.analysis.BenchmarkAnalysisRunner
 ```
 This command executes the complete benchmark suite, writes the results to `benchmark-data/` as CSV files, and then generates the statistical summary used throughout the benchmarking documentation.
 
