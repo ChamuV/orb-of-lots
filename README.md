@@ -12,11 +12,15 @@ The Orb of Lots is an online graph exploration problem in which an autonomous ag
 
 During exploration, the agent has access only to information available from its current position. At each step, it knows its current location, the neighbouring nodes that can be reached next, and the straight-line distance to the Orb. The remainder of the graph is revealed only through physical exploration, meaning every movement decision must be made using incomplete information. This places the problem within the domain of online graph search, where planning and exploration occur simultaneously.
 
-The aim of this project was to investigate how principles from classical graph search can be adapted to this online setting. Multiple search strategies were implemented, benchmarked, and evaluated to understand which ideas remain effective when the search graph is initially unknown. The investigation ultimately led to the design of Coverage-Biased Frontier Utility Search, a frontier-based exploration algorithm proposed in this project that extends frontier search by introducing a lightweight coverage heuristic to bias exploration towards frontier regions expected to maximise the amount of newly discovered environment.
+The aim of this project was to investigate how principles from classical graph search can be adapted to this online setting. Multiple search strategies were implemented, benchmarked, and evaluated to understand which ideas remain effective when the search graph is initially unknown. The investigation ultimately led to the design of Coverage-Biased Frontier Utility Search $(\lambda=1.5)$, a frontier-based exploration algorithm proposed in this project that extends frontier search by introducing a lightweight coverage heuristic to bias exploration towards frontier regions expected to maximise the amount of newly discovered environment.
 
 ---
 
-[GIF!]
+<p align="center">
+  <img src="docs/assets/CBFUS_113837.gif" width="70%"/>
+  <br/>
+  <em>Coverage-Biased Frontier Utility Search (λ = 1.5) — Seed 113837</em>
+</p>
 
 ---
 
@@ -75,7 +79,21 @@ $$
 
 where $c(n)$ represents a lightweight estimate of the expected amount of previously unseen environment revealed by exploring a frontier, and $\lambda$ is a tunable parameter controlling the influence of this additional exploration term.
 
-The resulting algorithm, **Coverage-Biased Frontier Utility Search**, extends frontier-based exploration by favouring frontier regions expected to maximise the amount of newly discovered environment while preserving the original frontier utility formulation. Rather than estimating true information gain, the coverage heuristic uses frontier density as a lightweight proxy for the amount of unexplored environment likely to be revealed, allowing the strategy to remain computationally inexpensive while encouraging exploration of promising regions.
+The resulting algorithm, **Coverage-Biased Frontier Utility Search**, extends frontier-based exploration by favouring frontier regions expected to maximise the amount of newly discovered environment while preserving the original frontier utility formulation. Rather than estimating true information gain, the coverage heuristic uses frontier density as a lightweight proxy for the amount of unexplored environment likely to be revealed, allowing the strategy to remain computationally inexpensive while encouraging exploration of promising regions. Based on experimental evaluation over 500 fixed seeds, a coverage weight of $λ = 1.5$ was selected, achieving the lowest mean movement count and strongest worst-case performance of any algorithm tested.
+
+<table>
+  <tr>
+    <td><img src="docs/assets/CBFUS_1138364087731029197.gif" width="100%"/></td>
+    <td><img src="docs/assets/GreedyDFS_1138364087731029197.gif" width="100%"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Coverage-Biased Frontier Utility Search (λ = 1.5)</b></td>
+    <td align="center"><b>Greedy DFS</b></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">Seed 1138364087731029197</td>
+  </tr>
+</table>
 
 The complete design rationale, implementation details and experimental evaluation are discussed in the accompanying **Algorithm Design** and **Benchmarking documentation**.
 
@@ -89,8 +107,7 @@ The complete design rationale, implementation details and experimental evaluatio
 │   ├── src/
 │   │   ├── main/java/student/
 │   │   │   ├── searchalg/          # Online search algorithm implementations
-│   │   │   ├── benchmark/          # Benchmark framework, data collection and analysis
-│   │   │   └── util/               # Shared utilities
+│   │   │   └── benchmark/          # Benchmark framework, data collection and analysis
 │   │   └── test/java/              # Unit and integration tests
 │
 ├── docs/
