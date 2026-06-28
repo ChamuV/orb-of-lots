@@ -12,151 +12,145 @@ The Orb of Lots is an online graph exploration problem in which an autonomous ag
 
 During exploration, the agent has access only to information available from its current position. At each step, it knows its current location, the neighbouring nodes that can be reached next, and the straight-line distance to the Orb. The remainder of the graph is revealed only through physical exploration, meaning every movement decision must be made using incomplete information. This places the problem within the domain of online graph search, where planning and exploration occur simultaneously.
 
-The aim of this project was to investigate how principles from classical graph search can be adapted to this online setting. Multiple search strategies were implemented, benchmarked, and evaluated to understand which ideas remain effective when the search graph is initially unknown. The findings from this investigation ultimately led to the development of Coverage-Biased Frontier Utility Search, a new frontier-based exploration algorithm that extends frontier search by introducing a lightweight coverage heuristic to bias exploration towards frontier regions expected to maximise the amount of newly discovered environment.
+The aim of this project was to investigate how principles from classical graph search can be adapted to this online setting. Multiple search strategies were implemented, benchmarked, and evaluated to understand which ideas remain effective when the search graph is initially unknown. The investigation ultimately led to the design of Coverage-Biased Frontier Utility Search, a new frontier-based exploration algorithm that extends frontier search by introducing a lightweight coverage heuristic to bias exploration towards frontier regions expected to maximise the amount of newly discovered environment.
 
 ---
 
-## The Search Problem
-
-The cavern is modelled as an undirected graph G = (V, E), where vertices are locations and edges are traversable connections. The agent starts at an unknown vertex s and must find the Orb at some unknown target vertex t.
-
-At each step, the agent has access to:
-
-- its **current location** and the locations of its **immediate neighbours**
-- a **heuristic distance estimate** to the Orb (not a true distance — just an indication of relative proximity)
-
-Global graph structure is **not available in advance**. This rules out classical offline algorithms like Dijkstra's or standard A* and motivates the algorithm families investigated below.
+[GIF!]
 
 ---
 
-## Selected Algorithm
+## Motivation
 
-The selected strategy is **Coverage-Biased Frontier Utility Search**, a novel algorithm developed from the frontier utility search family. Rather than choosing the next move based on local information alone, it maintains an explicit frontier — the set of all discovered but not yet visited nodes — and selects the best target globally at each decision point.
+The exploration phase can be viewed as an **online search problem**, in which the search policy is a function
 
-The scoring function for each frontier candidate n is:
+$$
+\pi : S_t \rightarrow A_t,
+$$
 
-```
-score(n) = h(n) + d(p, n) - μ · δ(n)
-```
+mapping the information available to the agent at time $t$ ($S_t$) to its next action ($A_t$). Unlike classical graph search, the state $S_t$ represents only a partial view of the environment, consisting of the explored graph, neighbouring frontier nodes, and the straight-line distance to the Orb.
 
-Where:
-- **h(n)** — heuristic distance from n to the Orb
-- **d(p, n)** — exact BFS travel cost from the agent's current position p to n
-- **δ(n)** — local frontier density: the number of n's known neighbours also in the frontier
-- **μ** — coverage weight; controls how strongly unexplored boundary regions are preferred
+If exploration is treated purely as the task of visiting unknown nodes, then simple strategies such as **Random Walk** and **Depth-First Search (DFS)** provide natural starting points. These algorithms require little or no prior knowledge of the environment and demonstrate that systematic exploration alone can successfully locate the Orb. However, they make movement decisions without explicitly considering the trade-off between progressing towards the Orb and maximising the information gained from each exploration step.
 
-The agent selects the frontier node n\* that minimises this score:
+This naturally raises the question of whether ideas from **classical heuristic search**, such as **A\***, can be adapted to improve exploration. In classical search, movement decisions are typically guided by an evaluation function
 
-```
-n* = argmin_{n ∈ V_f} [ h(n) + d(p, n) - μ · δ(n) ]
-```
+$$
+f(n)=g(n)+h(n),
+$$
 
-The coverage bonus μ · δ(n) rewards nodes that sit at the boundary of unexplored clusters, reducing catastrophic outcomes on seeds where the Orb is in a region the agent would otherwise reach last. The parameter μ was selected by systematic sweep across eleven values over 500 fixed seeds. μ = 1.0 produced the best mean move count (55.86) and the lowest worst-case of any algorithm tested (274 moves).
+where $g(n)$ represents the cost accumulated so far and $h(n)$ estimates the remaining cost to the goal. This formulation assumes that candidate paths can be evaluated over a complete search graph before traversal begins.
 
-Full mathematical treatment, architecture, and parameter selection rationale are in [`docs/final-selection.md`](docs/final-selection.md).
+During online exploration, however, these assumptions no longer hold. Since large portions of the graph remain unknown, an effective search strategy must balance progressing towards the Orb with discovering new areas of the environment. One promising family of online search algorithms is **frontier-based search**, which augments the classical evaluation function with an additional notion of frontier utility,
 
----
+$$
+f(n)=g(n)+h(n)+u(n),
+$$
 
-## Algorithm Investigation
+where $u(n)$ represents the expected utility of moving towards an unexplored frontier.
 
-Algorithms were investigated across four families, with each family motivated by a different approach to the explore/exploit trade-off inherent in online search.
-
-| Family | Algorithms |
-|---|---|
-| Baseline | DFS, Greedy DFS, BFS, Random Walk |
-| Heuristic online search | Real-Time A* (RTA*), IDA* |
-| Frontier utility search | FrontierUtilitySearch, ReplanningFrontierUtilitySearch |
-| Frontier utility variants | GradientFrontierUtilitySearch (λ variants), CoverageBiasedFrontierSearch (μ variants) |
-
-Several candidates were eliminated during development — either structurally incompatible with the online setting (bidirectional search requires a known goal) or outperformed without sufficient justification for their complexity. Full design history is in [`docs/algorithm-families.md`](docs/algorithm-families.md).
+Building upon these ideas, this investigation explores how the classical evaluation function can be progressively refined for online exploration, ultimately leading to the design of the final exploration algorithm presented in the following section.
 
 ---
 
-## Benchmarking
+## Coverage-Biased Frontier Utility Search
 
-Each algorithm was evaluated over 500 fixed random seeds in a single JVM invocation to eliminate warm-up variance. The selection criteria, defined before benchmarking began:
+While the frontier-based heuristic introduced an explicit notion of exploration utility through the term $u(n)$, encouraging the agent to move towards unexplored regions of the graph, it did not distinguish between frontiers that were equally attractive to reach, but very different in the amount of new environment they were expected to reveal. Two frontier regions could therefore appear equally attractive according to the heuristic, despite one revealing substantially more of the previously unseen environment than the other.
 
-1. **Mean move count** — primary metric
-2. **Worst-case move count** — robustness across difficult seeds
-3. **Coefficient of variation** — consistency across the seed set
-4. **Runtime reliability** — must complete within the 10-second limit
+This suggested that the evaluation function was still missing an important notion of exploration value. In addition to estimating the utility of moving towards a frontier, it should also estimate the **expected coverage** obtained by exploring beyond that frontier. This motivated the introduction of an additional coverage term, resulting in the modified evaluation function
 
-Coverage-Biased Frontier Utility Search (μ=1.0) was selected: best mean within the frontier family and the lowest worst-case of any algorithm tested (274 moves — a 31% reduction over the nearest competitor). Full results and methodology are in [`docs/benchmarking.md`](docs/benchmarking.md).
+$$
+f(n)=g(n)+h(n)+u(n)+\lambda c(n),
+$$
 
----
+where $c(n)$ represents a lightweight estimate of the expected amount of previously unseen environment revealed by exploring a frontier, and $\lambda$ is a tunable parameter controlling the influence of this additional exploration term.
 
-## Build and Run
+The resulting algorithm, **Coverage-Biased Frontier Utility Search**, extends frontier-based exploration by favouring frontier regions expected to maximise the amount of newly discovered environment while preserving the original frontier utility formulation.
 
-**Prerequisites:** Java 11+, Gradle.
-
-```bash
-# Run the test suite
-./gradlew clean test
-
-# Run with GUI (graphical cavern visualisation)
-./gradlew :temple:run -PchooseMain=main.GUImain
-
-# Run with text output
-./gradlew :temple:run -PchooseMain=main.TXTmain
-
-# Run the full benchmark suite (all algorithms, fixed seed set)
-# No recompilation needed after first build
-java -cp build/libs/temple-*.jar main.BulkBenchmarkMain
-```
-
-> Run the benchmark from the `temple/` directory after an initial `./gradlew build`.
+The complete design rationale, implementation details and experimental evaluation are discussed in the accompanying **Algorithm Design** and **Benchmarking documentation**.
 
 ---
 
-## Project Structure
+## Repository Structure
 
-```
+```text
 .
 ├── temple/
-│   └── src/
-│       ├── main/java/
-│       │   └── student/
-│       │       ├── searchalg/        # All exploration algorithm implementations
-│       │       └── benchmark/        # Benchmarking infrastructure
-│       └── test/java/                # Unit and integration tests
+│   ├── src/
+│   │   ├── main/java/student/
+│   │   │   ├── searchalg/          # Online search algorithm implementations
+│   │   │   ├── benchmark/          # Benchmark framework, data collection and analysis
+│   │   │   └── util/               # Shared utilities
+│   │   └── test/java/              # Unit and integration tests
 │
 ├── docs/
-│   ├── algorithm-families.md         # Motivation, design, and elimination of candidate algorithms
-│   ├── benchmarking.md               # Methodology, seed lists, and full results
-│   ├── final-selection.md            # Rationale for final algorithm choice
-│   └── design-decisions.md           # Key implementation and architectural decisions
+│   ├── algorithm-design.md         # Evolution of the final exploration algorithm
+│   ├── benchmarking.md             # Experimental methodology and performance evaluation
+│   ├── architecture.md             # Software architecture and design decisions
+│   ├── development.md              # Engineering decisions and project evolution
+│   └── testing.md                  # Testing strategy and validation
 │
-├── benchmark-data/                   # Raw CSV output from benchmark runs
-├── README.md
+├── benchmark-data/                 # Benchmark CSV output and experimental data
+├── README.md                       
 └── LICENSE
 ```
 
 ---
 
-## Testing
+## Build and Run
 
-Tests are in `temple/src/test/java` and cover:
+### Requirements
 
-- **Unit tests** for core helper methods and utility functions
-- **Component tests** for individual algorithmic decisions (frontier scoring, replanning triggers)
-- **Reproducible benchmarks** using fixed random seeds with CSV output for analysis
+- Java 21
+- Gradle (or the included Gradle Wrapper)
+
+### Build
+
+```bash
+./gradlew build
+```
+
+### Run the graphical interface
+```bash
+./gradlew :temple:run -PchooseMain=main.GUImain
+```
+
+### Run the text interface
+```bash
+./gradlew :temple:run -PchooseMain=main.TXTmain
+```
+
+### Run the benchmark suite (optional)
+```bash
+./gradlew :temple:run -PchooseMain=main.BulkBenchmarkMain
+```
+Benchmark results are written to the `benchmark-data/` directory as CSV files.
+
 
 ---
 
-## Documentation
+## Project Documentation
 
-| Document | Contents |
-|---|---|
-| [`algorithm-families.md`](docs/algorithm-families.md) | Motivation and analysis of each algorithm family investigated |
-| [`benchmarking.md`](docs/benchmarking.md) | Benchmark methodology, metrics, seed set, and full results |
-| [`final-selection.md`](docs/final-selection.md) | Final algorithm selection with experimental justification |
-| [`design-decisions.md`](docs/design-decisions.md) | Architectural choices, refactoring history, and engineering trade-offs |
+The repository is accompanied by detailed documentation describing the algorithmic investigation, software design, benchmarking methodology and testing strategy.
+
+| Document | Description |
+|----------|-------------|
+| `docs/algorithm-design.md` | Evolution of the search algorithms and the development of Coverage-Biased Frontier Utility Search. |
+| `docs/benchmarking.md` | Benchmark methodology, evaluation metrics and comparative performance analysis. |
+| `docs/architecture.md` | Software architecture, design patterns and engineering decisions. |
+| `docs/development.md` | Project evolution, implementation challenges and future improvements. |
+| `docs/testing.md` | Unit testing strategy, benchmark validation and code coverage. |
 
 ---
 
 ## Acknowledgements
 
-The Orb of Lots framework was originally developed by Eric Perdew, Ryan Pindulic, and Ethan Cecchetti at Cornell University's Department of Computer Science. All exploration algorithm implementations in this repository are my own work, developed for the Software Design & Programming module.
+The Orb of Lots framework was originally developed by Eric Perdew, Ryan Pindulic, and Ethan Cecchetti at Cornell University's Department of Computer Science. This repository contains my own exploration algorithms together with the accompanying benchmarking and software engineering infrastructure.
+
+---
+
+## License
+
+Released under the MIT License.
 
 ---
 

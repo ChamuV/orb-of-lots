@@ -22,8 +22,6 @@ where each additional term addresses a limitation identified in the previous for
 
 ## 1. Systematic Exploration
 
-### The starting point
-
 The first question considered during the investigation was deliberately simple:
 
 > **Can the Orb be found reliably without attempting to optimise the search?**
