@@ -118,6 +118,8 @@ The complete design rationale, implementation details and experimental evaluatio
 │   └── architecture.md             # Software architecture and design decisions
 │
 ├── benchmark-data/                 # Benchmark CSV output and experimental data
+│   ├── seeds.txt                   # Fixed seed set used for all experiments
+│   └── *.csv                       # Per-algorithm benchmark results (500 seeds each)
 ├── README.md                       
 └── LICENSE
 ```
